@@ -1,13 +1,12 @@
 %{
 #include <stdio.h>
-#include "lex.yy.c"
 %}
 
-/* Définition des tokens */
+
 DIGIT   [0-9]+
-COLOR   [a-zA-Z]+(-[a-zA-Z0-9]+)?
+COLOR (red|blue|green|yellow|purple|orange|pink|black|white|gray|cyan|magenta|lime|teal|navy|olive|maroon|silver|gold|brown)
 HEXCOLOR  #[0-9a-fA-F]{3,6}
-SIZE    (sm|md|lg|xl)
+SIZE    (small|medium|large|xlarge)
 WEIGHT  (bold|light)
 OPTION  (center|between)
 
@@ -15,7 +14,9 @@ OPTION  (center|between)
 
 "text-"{COLOR}       { printf("TEXT_COLOR: %s\n", yytext); }
 "bg-"{COLOR}         { printf("BG_COLOR: %s\n", yytext); }
+"border-"{SIZE}     { printf("BORDER_SIZE: %s\n", yytext); }
 "border-"{COLOR}     { printf("BORDER_COLOR: %s\n", yytext); }
+
 
 "text-"{HEXCOLOR}    { printf("TEXT_HEX_COLOR: %s\n", yytext); }
 "bg-"{HEXCOLOR}      { printf("BG_HEX_COLOR: %s\n", yytext); }
@@ -35,11 +36,12 @@ OPTION  (center|between)
 "justify-"{OPTION}  { printf("JUSTIFY: %s\n", yytext); }
 "items-"{OPTION}    { printf("ITEMS_ALIGN: %s\n", yytext); }
 
-"[()",]"            { printf("SYMBOL: %s\n", yytext); }
-[a-zA-Z0-9_-]+      { printf("TEXT: %s\n", yytext); }
+[(),]              { printf("SYMBOL: %s\n", yytext); }
 
-[ \t\n]             { /* Ignorer les espaces et nouvelles lignes */ }
-.                   { printf("UNKNOWN: %s\n", yytext); }
+
+[ \t\n]            { /* Ignorer les espaces et nouvelles lignes */ }
+[a-zA-Z0-9_-]+     { printf("TEXT: %s\n", yytext); }
+.                  { printf("UNKNOWN: %s\n", yytext); }
 
 %%
 
@@ -51,3 +53,5 @@ int main() {
 int yywrap() {
     return 1;
 }
+
+
