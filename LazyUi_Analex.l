@@ -5,6 +5,19 @@
 
 %%
 
+[a-zA-Z_][a-zA-Z0-9_]*   { printf("Identificateur: %s\n", yytext); }
+
+":"    { printf("Separateur: %s\n", yytext); }
+"{"    { printf("Separateur: %s\n", yytext); }
+"}"    { printf("Separateur: %s\n", yytext); }
+"("    { printf("Separateur: %s\n", yytext); }
+")"    { printf("Separateur: %s\n", yytext); }
+","    { printf("Separateur: %s\n", yytext); }
+";"    { printf("Separateur: %s\n", yytext); }
+
+[ \t\n]+   ;  /* Ignorer les espaces et sauts de ligne */
+
+.   { printf("SYMBOLE NON RECONNU: %s\n", yytext); }
 
 %%  
 
