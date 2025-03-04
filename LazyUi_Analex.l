@@ -2,56 +2,35 @@
 #include <stdio.h>
 %}
 
+%%
+"w"     { printf("TOKEN_ET \n"); }
+"wla"   { printf("TOKEN_OU \n"); }
+"machi" { printf("TOKEN_NON \n"); }
 
-DIGIT   [0-9]+
-COLOR (red|blue|green|yellow|purple|orange|pink|black|white|gray|cyan|magenta|lime|teal|navy|olive|maroon|silver|gold|brown)
-HEXCOLOR  #[0-9a-fA-F]{3,6}
-SIZE    (small|medium|large|xlarge)
-WEIGHT  (bold|light)
-OPTION  (center|between)
+" + "     { printf("TOKEN_ADD \n"); }
+"-"     { printf("TOKEN_SUB \n"); }
+"*"     { printf("TOKEN_MUL \n"); }
+"/"     { printf("TOKEN_DIV \n"); }
+"!"     { printf("TOKEN_FACT \n"); }
+"div"   { printf("TOKEN_INT_DIV \n"); }
+
+">"     { printf("TOKEN_SUP \n"); }
+">="    { printf("TOKEN_SUP_EQ \n"); }
+"<"     { printf("TOKEN_INF \n"); }
+"<="    { printf("TOKEN_INF_EQ \n"); }
+"<>"    { printf("TOKEN_DIFF \n"); }
+"=="    { printf("TOKEN_EGAL \n"); }
+
+":="    { printf("TOKEN_AFFECTATION\n"); }
+
+
+[ \t\n]+        ; /* Ignorer les espaces et les retours à la ligne */
 
 %%
 
-"text-"{COLOR}       { printf("TEXT_COLOR: %s\n", yytext); }
-"bg-"{COLOR}         { printf("BG_COLOR: %s\n", yytext); }
-"border-"{SIZE}     { printf("BORDER_SIZE: %s\n", yytext); }
-"border-"{COLOR}     { printf("BORDER_COLOR: %s\n", yytext); }
-
-
-"text-"{HEXCOLOR}    { printf("TEXT_HEX_COLOR: %s\n", yytext); }
-"bg-"{HEXCOLOR}      { printf("BG_HEX_COLOR: %s\n", yytext); }
-"border-"{HEXCOLOR}  { printf("BORDER_HEX_COLOR: %s\n", yytext); }
-
-"m-"{DIGIT}          { printf("MARGIN: %s\n", yytext); }
-"p-"{DIGIT}          { printf("PADDING: %s\n", yytext); }
-
-"text-"{SIZE}        { printf("TEXT_SIZE: %s\n", yytext); }
-"font-"{WEIGHT}      { printf("FONT_WEIGHT: %s\n", yytext); }
-"italic"            { printf("ITALIC\n"); }
-"underline"         { printf("UNDERLINE\n"); }
-
-"flex"              { printf("DISPLAY_FLEX\n"); }
-"grid"              { printf("DISPLAY_GRID\n"); }
-
-"justify-"{OPTION}  { printf("JUSTIFY: %s\n", yytext); }
-"items-"{OPTION}    { printf("ITEMS_ALIGN: %s\n", yytext); }
-
-[(),]              { printf("SYMBOL: %s\n", yytext); }
-
-
-[ \t\n]            { /* Ignorer les espaces et nouvelles lignes */ }
-[a-zA-Z0-9_-]+     { printf("TEXT: %s\n", yytext); }
-.                  { printf("UNKNOWN: %s\n", yytext); }
-
-%%
+int yywrap() { return 1; }
 
 int main() {
     yylex();
     return 0;
 }
-
-int yywrap() {
-    return 1;
-}
-
-
