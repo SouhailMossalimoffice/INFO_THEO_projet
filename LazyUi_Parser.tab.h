@@ -1,21 +1,24 @@
-/* A Bison parser, made by GNU Bison 2.7.  */
+/* A Bison parser, made by GNU Bison 2.3.  */
 
-/* Bison interface for Yacc-like parsers in C
-   
-      Copyright (C) 1984, 1989-1990, 2000-2012 Free Software Foundation, Inc.
-   
-   This program is free software: you can redistribute it and/or modify
+/* Skeleton interface for Bison's Yacc-like parsers in C
+
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   Free Software Foundation, Inc.
+
+   This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-   
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -26,19 +29,9 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
-
-#ifndef YY_YY_LAZYUI_PARSER_TAB_H_INCLUDED
-# define YY_YY_LAZYUI_PARSER_TAB_H_INCLUDED
-/* Enabling traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
-#endif
-#if YYDEBUG
-extern int yydebug;
-#endif
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -109,40 +102,86 @@ extern int yydebug;
      TK_WLALA = 318
    };
 #endif
+/* Tokens.  */
+#define TK_IDENTIFIANT 258
+#define TK_RA9M 259
+#define TK_KTABA 260
+#define TK_WA9ILA 261
+#define TK_LISTA 262
+#define TK_JADWAL 263
+#define TK_SEMICOLON 264
+#define TK_LBRACKET 265
+#define TK_RBRACKET 266
+#define TK_LBRACE 267
+#define TK_RBRACE 268
+#define TK_COLON 269
+#define TK_AFFECTATION 270
+#define TK_COMMA 271
+#define TK_DOT 272
+#define TK_LPAREN 273
+#define TK_RPAREN 274
+#define TK_FACT 275
+#define TK_NON 276
+#define TK_ET 277
+#define TK_OU 278
+#define TK_EQUAL 279
+#define TK_DIFF 280
+#define TK_SUP 281
+#define TK_INF 282
+#define TK_SUP_EQ 283
+#define TK_INF_EQ 284
+#define TK_INT_DIV 285
+#define TK_NUMBER 286
+#define TK_STRING 287
+#define TK_ILA 288
+#define TK_WILAKAN 289
+#define TK_ILAMAKANCH 290
+#define TK_MN 291
+#define TK_MA7ED 292
+#define TK_TAWZI3 293
+#define TK_KTEB 294
+#define TK_DAKHAL 295
+#define TK_TAARIF 296
+#define TK_RJE3 297
+#define TK_MAIN 298
+#define TK_W 299
+#define TK_WLA 300
+#define TK_MACHI 301
+#define TK_L 302
+#define TK_B 303
+#define TK_ADD 304
+#define TK_SUB 305
+#define TK_MUL 306
+#define TK_DIV 307
+#define TK_HITACH 308
+#define TK_FI_HALAT 309
+#define TK_KML_HTAL 310
+#define TK_DIR 311
+#define TK_FI 312
+#define TK_JARRAB 313
+#define TK_L_KOL 314
+#define TK_ZID 315
+#define TK_MSAH 316
+#define TK_HTAL 317
+#define TK_WLALA 318
+
+
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-{
-/* Line 2058 of yacc.c  */
 #line 25 "LazyUi_Parser.y"
-
+{
     double number;
     char* string;
-
-
-/* Line 2058 of yacc.c  */
-#line 126 "LazyUi_Parser.tab.h"
-} YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
+}
+/* Line 1529 of yacc.c.  */
+#line 180 "LazyUi_Parser.tab.h"
+	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
+# define YYSTYPE_IS_TRIVIAL 1
 #endif
 
 extern YYSTYPE yylval;
 
-#ifdef YYPARSE_PARAM
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void *YYPARSE_PARAM);
-#else
-int yyparse ();
-#endif
-#else /* ! YYPARSE_PARAM */
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void);
-#else
-int yyparse ();
-#endif
-#endif /* ! YYPARSE_PARAM */
-
-#endif /* !YY_YY_LAZYUI_PARSER_TAB_H_INCLUDED  */

@@ -153,6 +153,7 @@ expression_logique
     | TK_NON expression_logique
     ;
 
+
 expression_comparison
     : expression_arithmetique
     | expression_comparison TK_EQUAL expression_comparison
@@ -186,12 +187,10 @@ facteur
 valeur
     : TK_NUMBER
     | TK_STRING
-    | booleen
+    | TK_IDENTIFIANT /* Add this to make identifiers a valid value */
+    | TK_IDENTIFIANT acces_element /* Add this for struct/array access */
     ;
 
-booleen
-    : TK_NUMBER
-    ;
 
 appel_fonction_expr
     : TK_IDENTIFIANT TK_LPAREN arguments TK_RPAREN
