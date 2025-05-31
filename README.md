@@ -1,98 +1,154 @@
-# Symbol Table and AST for LazyUi Compiler
+# LazyUi - A Minimal Functional Programming Language
 
-This project implements a symbol table and Abstract Syntax Tree (AST) for the LazyUi programming language compiler.
+LazyUi is a minimal functional programming language designed for educational purposes and simple computations. It features a clean syntax inspired by functional programming paradigms while maintaining simplicity and readability.
 
 ## Features
 
-- Symbol table with support for nested scopes
-- Type management (ra9m, ktaba, wa9ila, lista, jadwal)
-- AST node creation and management
-- Semantic analysis
-- Memory management for all allocated structures
-- Debug utilities for visualization
+- Basic arithmetic operations (addition, subtraction, multiplication, division)
+- Function declarations and calls
+- Variable declarations and assignments
+- Print statements for output
+- Type system with number type (ra9m)
+- Clean and intuitive syntax
 
-## Files
+## Language Syntax
 
-- `ast.h` - Header file with symbol table and AST definitions
-- `ast.c` - Implementation of symbol table and AST operations
-- `test_ast.c` - Test program for basic symbol table and AST operations
-- `test_jadwal.c` - Test program specifically for jadwal (struct) functionality
-- `Makefile` - Build configuration
+### Basic Syntax Elements
 
-## Building
+```nova
+# Variable Declaration
+ra9m x = 10;
 
-To build all the test programs:
+# Function Declaration
+taarif ra9m add(a, b) {
+    rje3 a + b;
+}
 
-```
-make
-```
+# Function Call
+ra9m sum = add(x, y);
 
-To build specific test program:
-
-```
-make test_ast
+# Print Statement
+kteb(sum);
 ```
 
-or
+### Keywords
 
-```
-make test_jadwal
-```
+- `taarif`: Function declaration
+- `ra9m`: Number type
+- `rje3`: Return statement
+- `kteb`: Print statement
 
-## Running Tests
+## Building and Running
 
-To run all tests:
+### Prerequisites
 
-```
-make run
-```
+- GCC compiler
+- Make
+- Flex
+- Bison
 
-To run a specific test:
+### Building the Compiler
 
-```
-make run_ast
-```
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/lazyui.git
+cd lazyui
 
-or
-
-```
-make run_jadwal
-```
-
-## Integrating with Your Parser
-
-To integrate this symbol table and AST implementation with your parser:
-
-1. Include `ast.h` in your parser file (LazyUi_Parser.y)
-2. Initialize the symbol table in your main function
-3. Build AST nodes during parsing using the node creation functions
-4. Perform semantic analysis on the resulting AST
-5. Use the AST for code generation or interpretation
-
-Example integration:
-
-```c
-#include "ast.h"
-
-// In your main function
-SymbolTable *symbol_table = create_symbol_table();
-ASTNode *ast_root = NULL;
-
-// After successful parsing
-analyze_ast(ast_root, symbol_table);
-
-// When done
-free_ast_node(ast_root);
-free_symbol_table(symbol_table);
+# Build the compiler
+make clean && make
 ```
 
-## Memory Management
+### Running Programs
 
-All memory allocated for the symbol table and AST is properly managed with these functions:
+1. Write your program in a `.nova` file
+2. Compile and run:
+```bash
+./nova_compiler your_program.nova
+```
 
-- `free_symbol_table(table)` - Frees all memory for a symbol table
-- `free_ast_node(node)` - Recursively frees all memory for an AST node and its children
-- `free_parameters(param)` - Frees a linked list of parameters
-- `free_fields(field)` - Frees a linked list of fields
+The compiler will:
+1. Parse your code
+2. Generate an AST
+3. Perform semantic analysis
+4. Generate C code
+5. Create an executable
 
-Make sure to call these functions when your structures are no longer needed to avoid memory leaks.
+## Example Programs
+
+### Basic Arithmetic
+
+```nova
+taarif ra9m add(a, b) {
+    rje3 a + b;
+}
+
+taarif ra9m subtract(a, b) {
+    rje3 a - b;
+}
+
+taarif ra9m multiply(a, b) {
+    rje3 a * b;
+}
+
+taarif ra9m divide(a, b) {
+    rje3 a / b;
+}
+
+taarif ra9m main() {
+    ra9m x = 10;
+    ra9m y = 5;
+    
+    ra9m sum = add(x, y);
+    ra9m diff = subtract(x, y);
+    ra9m prod = multiply(x, y);
+    ra9m quot = divide(x, y);
+    
+    kteb(sum);
+    kteb(diff);
+    kteb(prod);
+    kteb(quot);
+}
+```
+
+## Testing
+
+The language comes with a test suite. To run the tests:
+
+```bash
+# Run all tests
+make test
+
+# Run a specific test
+./nova_compiler tests/minimal_func.nova
+```
+
+## Project Structure
+
+```
+lazyui/
+├── LazyUi_Analex.l    # Lexer definition
+├── LazyUi_Parser.y    # Parser definition
+├── ast.h             # AST definitions
+├── ast.c             # AST implementation
+├── codegen.h         # Code generation header
+├── codegen.c         # Code generation implementation
+├── tests/            # Test files
+└── Makefile          # Build configuration
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Author
+
+[Your Name]
+
+## Acknowledgments
+
+- Thanks to all contributors and users of LazyUi
+- Inspired by functional programming languages and compiler design principles

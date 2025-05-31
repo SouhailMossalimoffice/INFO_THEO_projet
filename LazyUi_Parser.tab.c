@@ -268,6 +268,38 @@ void flatten_arguments(ASTNode* seq, ASTNode*** out_args, int* out_count) {
     *out_count = count;
 }
 
+// Helper to extract main function from declarations
+void extract_main_function(ASTNode* decls, ASTNode** out_decls, ASTNode** out_main) {
+    if (!decls) {
+        *out_decls = NULL;
+        *out_main = NULL;
+        return;
+    }
+    if (decls->type == NODE_FUNCTION_DECLARATION && strcmp(decls->data.func_decl.name, "main") == 0) {
+        *out_decls = NULL;
+        *out_main = decls;
+        return;
+    }
+    if (decls->type == NODE_SEQUENCE) {
+        ASTNode *first = decls->data.sequence.first;
+        ASTNode *second = decls->data.sequence.second;
+        ASTNode *main_func = NULL;
+        ASTNode *rest = NULL;
+        extract_main_function(first, &rest, &main_func);
+        if (main_func) {
+            *out_main = main_func;
+            *out_decls = second;
+        } else {
+            extract_main_function(second, &rest, &main_func);
+            *out_main = main_func;
+            *out_decls = first;
+        }
+        return;
+    }
+    *out_decls = decls;
+    *out_main = NULL;
+}
+
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -289,7 +321,7 @@ void flatten_arguments(ASTNode* seq, ASTNode*** out_args, int* out_count) {
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 73 "LazyUi_Parser.y"
+#line 105 "LazyUi_Parser.y"
 {
     double number;
     char* string;
@@ -297,7 +329,7 @@ typedef union YYSTYPE
     struct Parameter* param_list;
 }
 /* Line 193 of yacc.c.  */
-#line 301 "LazyUi_Parser.tab.c"
+#line 333 "LazyUi_Parser.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -310,7 +342,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 314 "LazyUi_Parser.tab.c"
+#line 346 "LazyUi_Parser.tab.c"
 
 #ifdef short
 # undef short
@@ -612,10 +644,10 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   109,   109,   118,   122,   129,   134,   142,   146,   153,
-     162,   165,   169,   176,   177,   178,   179,   180,   184,   192,
-     200,   208,   216,   220,   221,   226,   234,   235,   240,   248,
-     253,   258,   259,   263,   271,   279,   280,   288
+       0,   141,   141,   152,   156,   163,   168,   176,   180,   187,
+     196,   199,   203,   210,   211,   212,   213,   214,   218,   226,
+     234,   242,   250,   254,   255,   260,   268,   269,   274,   282,
+     287,   292,   293,   297,   305,   313,   314,   322
 };
 #endif
 
@@ -1574,30 +1606,32 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 110 "LazyUi_Parser.y"
+#line 142 "LazyUi_Parser.y"
     {
         debug_print("Parsing programme");
-        ast_root = create_program_node((yyvsp[(1) - (1)].ast_node), NULL, yylineno);
+        ASTNode *main_func = NULL, *decls = NULL;
+        extract_main_function((yyvsp[(1) - (1)].ast_node), &decls, &main_func);
+        ast_root = create_program_node(decls, main_func, yylineno);
         generate_code_entry(ast_root);
     ;}
     break;
 
   case 3:
-#line 119 "LazyUi_Parser.y"
+#line 153 "LazyUi_Parser.y"
     {
         (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node);
     ;}
     break;
 
   case 4:
-#line 123 "LazyUi_Parser.y"
+#line 157 "LazyUi_Parser.y"
     {
         (yyval.ast_node) = create_sequence_node((yyvsp[(1) - (2)].ast_node), (yyvsp[(2) - (2)].ast_node), yylineno);
     ;}
     break;
 
   case 5:
-#line 130 "LazyUi_Parser.y"
+#line 164 "LazyUi_Parser.y"
     {
         debug_print("Function declaration with parameters");
         (yyval.ast_node) = create_function_declaration_node((yyvsp[(3) - (7)].string), TYPE_RA9M, (yyvsp[(5) - (7)].param_list), (yyvsp[(7) - (7)].ast_node), yylineno);
@@ -1605,7 +1639,7 @@ yyreduce:
     break;
 
   case 6:
-#line 135 "LazyUi_Parser.y"
+#line 169 "LazyUi_Parser.y"
     {
         debug_print("Function declaration without parameters");
         (yyval.ast_node) = create_function_declaration_node((yyvsp[(3) - (6)].string), TYPE_RA9M, NULL, (yyvsp[(6) - (6)].ast_node), yylineno);
@@ -1613,21 +1647,21 @@ yyreduce:
     break;
 
   case 7:
-#line 143 "LazyUi_Parser.y"
+#line 177 "LazyUi_Parser.y"
     {
         (yyval.param_list) = (yyvsp[(1) - (1)].param_list);
     ;}
     break;
 
   case 8:
-#line 147 "LazyUi_Parser.y"
+#line 181 "LazyUi_Parser.y"
     {
         (yyval.param_list) = append_parameter((yyvsp[(1) - (3)].param_list), (yyvsp[(3) - (3)].param_list));
     ;}
     break;
 
   case 9:
-#line 154 "LazyUi_Parser.y"
+#line 188 "LazyUi_Parser.y"
     {
         debug_print("Found parameter");
         (yyval.param_list) = create_parameter((yyvsp[(2) - (2)].string), TYPE_RA9M);
@@ -1635,53 +1669,53 @@ yyreduce:
     break;
 
   case 10:
-#line 162 "LazyUi_Parser.y"
+#line 196 "LazyUi_Parser.y"
     {
         (yyval.ast_node) = NULL;
     ;}
     break;
 
   case 11:
-#line 166 "LazyUi_Parser.y"
+#line 200 "LazyUi_Parser.y"
     {
         (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node);
     ;}
     break;
 
   case 12:
-#line 170 "LazyUi_Parser.y"
+#line 204 "LazyUi_Parser.y"
     {
         (yyval.ast_node) = create_sequence_node((yyvsp[(1) - (2)].ast_node), (yyvsp[(2) - (2)].ast_node), yylineno);
     ;}
     break;
 
   case 13:
-#line 176 "LazyUi_Parser.y"
+#line 210 "LazyUi_Parser.y"
     { debug_print("Reducing: instruction_retour"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
     break;
 
   case 14:
-#line 177 "LazyUi_Parser.y"
+#line 211 "LazyUi_Parser.y"
     { debug_print("Reducing: declaration_variable"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
     break;
 
   case 15:
-#line 178 "LazyUi_Parser.y"
+#line 212 "LazyUi_Parser.y"
     { debug_print("Reducing: affectation"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
     break;
 
   case 16:
-#line 179 "LazyUi_Parser.y"
+#line 213 "LazyUi_Parser.y"
     { debug_print("Reducing: function call"); (yyval.ast_node) = (yyvsp[(1) - (2)].ast_node); ;}
     break;
 
   case 17:
-#line 180 "LazyUi_Parser.y"
+#line 214 "LazyUi_Parser.y"
     { debug_print("Reducing: print statement"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
     break;
 
   case 18:
-#line 185 "LazyUi_Parser.y"
+#line 219 "LazyUi_Parser.y"
     {
         debug_print("Found print statement");
         (yyval.ast_node) = create_print_node((yyvsp[(3) - (5)].ast_node), yylineno);
@@ -1689,7 +1723,7 @@ yyreduce:
     break;
 
   case 19:
-#line 193 "LazyUi_Parser.y"
+#line 227 "LazyUi_Parser.y"
     {
         debug_print("Found variable declaration with initialization");
         (yyval.ast_node) = create_var_declaration_node((yyvsp[(2) - (5)].string), TYPE_RA9M, (yyvsp[(4) - (5)].ast_node), yylineno);
@@ -1697,7 +1731,7 @@ yyreduce:
     break;
 
   case 20:
-#line 201 "LazyUi_Parser.y"
+#line 235 "LazyUi_Parser.y"
     {
         debug_print("Found assignment");
         (yyval.ast_node) = create_assignment_node(create_identifier_node((yyvsp[(1) - (4)].string), yylineno), (yyvsp[(3) - (4)].ast_node), yylineno);
@@ -1705,7 +1739,7 @@ yyreduce:
     break;
 
   case 21:
-#line 209 "LazyUi_Parser.y"
+#line 243 "LazyUi_Parser.y"
     {
         debug_print("Reducing: instruction_retour (rje3)");
         (yyval.ast_node) = create_return_node((yyvsp[(2) - (3)].ast_node), yylineno);
@@ -1713,17 +1747,17 @@ yyreduce:
     break;
 
   case 22:
-#line 216 "LazyUi_Parser.y"
+#line 250 "LazyUi_Parser.y"
     { (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
     break;
 
   case 23:
-#line 220 "LazyUi_Parser.y"
+#line 254 "LazyUi_Parser.y"
     { (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
     break;
 
   case 24:
-#line 222 "LazyUi_Parser.y"
+#line 256 "LazyUi_Parser.y"
     {
         debug_print("Found addition");
         (yyval.ast_node) = create_binary_op_node(OP_ADD, (yyvsp[(1) - (3)].ast_node), (yyvsp[(3) - (3)].ast_node), yylineno);
@@ -1731,7 +1765,7 @@ yyreduce:
     break;
 
   case 25:
-#line 227 "LazyUi_Parser.y"
+#line 261 "LazyUi_Parser.y"
     {
         debug_print("Found subtraction");
         (yyval.ast_node) = create_binary_op_node(OP_SUB, (yyvsp[(1) - (3)].ast_node), (yyvsp[(3) - (3)].ast_node), yylineno);
@@ -1739,12 +1773,12 @@ yyreduce:
     break;
 
   case 26:
-#line 234 "LazyUi_Parser.y"
+#line 268 "LazyUi_Parser.y"
     { (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
     break;
 
   case 27:
-#line 236 "LazyUi_Parser.y"
+#line 270 "LazyUi_Parser.y"
     {
         debug_print("Found multiplication");
         (yyval.ast_node) = create_binary_op_node(OP_MUL, (yyvsp[(1) - (3)].ast_node), (yyvsp[(3) - (3)].ast_node), yylineno);
@@ -1752,7 +1786,7 @@ yyreduce:
     break;
 
   case 28:
-#line 241 "LazyUi_Parser.y"
+#line 275 "LazyUi_Parser.y"
     {
         debug_print("Found division");
         (yyval.ast_node) = create_binary_op_node(OP_DIV, (yyvsp[(1) - (3)].ast_node), (yyvsp[(3) - (3)].ast_node), yylineno);
@@ -1760,7 +1794,7 @@ yyreduce:
     break;
 
   case 29:
-#line 249 "LazyUi_Parser.y"
+#line 283 "LazyUi_Parser.y"
     {
         debug_print("Found number");
         (yyval.ast_node) = create_number_node((yyvsp[(1) - (1)].number), yylineno);
@@ -1768,7 +1802,7 @@ yyreduce:
     break;
 
   case 30:
-#line 254 "LazyUi_Parser.y"
+#line 288 "LazyUi_Parser.y"
     {
         debug_print("Found identifier");
         (yyval.ast_node) = create_identifier_node((yyvsp[(1) - (1)].string), yylineno);
@@ -1776,17 +1810,17 @@ yyreduce:
     break;
 
   case 31:
-#line 258 "LazyUi_Parser.y"
+#line 292 "LazyUi_Parser.y"
     { (yyval.ast_node) = (yyvsp[(2) - (3)].ast_node); ;}
     break;
 
   case 32:
-#line 259 "LazyUi_Parser.y"
+#line 293 "LazyUi_Parser.y"
     { (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
     break;
 
   case 33:
-#line 264 "LazyUi_Parser.y"
+#line 298 "LazyUi_Parser.y"
     {
         debug_print("Found function call with arguments");
         ASTNode** args = NULL;
@@ -1797,7 +1831,7 @@ yyreduce:
     break;
 
   case 34:
-#line 272 "LazyUi_Parser.y"
+#line 306 "LazyUi_Parser.y"
     {
         debug_print("Found function call without arguments");
         (yyval.ast_node) = create_function_call_node((yyvsp[(1) - (3)].string), NULL, 0, yylineno);
@@ -1805,12 +1839,12 @@ yyreduce:
     break;
 
   case 35:
-#line 279 "LazyUi_Parser.y"
+#line 313 "LazyUi_Parser.y"
     { (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
     break;
 
   case 36:
-#line 281 "LazyUi_Parser.y"
+#line 315 "LazyUi_Parser.y"
     {
         debug_print("Found multiple arguments");
         (yyval.ast_node) = create_sequence_node((yyvsp[(1) - (3)].ast_node), (yyvsp[(3) - (3)].ast_node), yylineno);
@@ -1818,7 +1852,7 @@ yyreduce:
     break;
 
   case 37:
-#line 289 "LazyUi_Parser.y"
+#line 323 "LazyUi_Parser.y"
     {
         debug_print("Found block");
         (yyval.ast_node) = (yyvsp[(2) - (3)].ast_node);
@@ -1827,7 +1861,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1831 "LazyUi_Parser.tab.c"
+#line 1865 "LazyUi_Parser.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2041,7 +2075,7 @@ yyreturn:
 }
 
 
-#line 295 "LazyUi_Parser.y"
+#line 329 "LazyUi_Parser.y"
 
 
 void yyerror(const char* s) {

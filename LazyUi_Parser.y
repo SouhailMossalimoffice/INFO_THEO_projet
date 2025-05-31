@@ -68,6 +68,38 @@ void flatten_arguments(ASTNode* seq, ASTNode*** out_args, int* out_count) {
     *out_args = args;
     *out_count = count;
 }
+
+// Helper to extract main function from declarations
+void extract_main_function(ASTNode* decls, ASTNode** out_decls, ASTNode** out_main) {
+    if (!decls) {
+        *out_decls = NULL;
+        *out_main = NULL;
+        return;
+    }
+    if (decls->type == NODE_FUNCTION_DECLARATION && strcmp(decls->data.func_decl.name, "main") == 0) {
+        *out_decls = NULL;
+        *out_main = decls;
+        return;
+    }
+    if (decls->type == NODE_SEQUENCE) {
+        ASTNode *first = decls->data.sequence.first;
+        ASTNode *second = decls->data.sequence.second;
+        ASTNode *main_func = NULL;
+        ASTNode *rest = NULL;
+        extract_main_function(first, &rest, &main_func);
+        if (main_func) {
+            *out_main = main_func;
+            *out_decls = second;
+        } else {
+            extract_main_function(second, &rest, &main_func);
+            *out_main = main_func;
+            *out_decls = first;
+        }
+        return;
+    }
+    *out_decls = decls;
+    *out_main = NULL;
+}
 %}
 
 %union {
@@ -109,7 +141,9 @@ programme
     : declarations_fonctions
     {
         debug_print("Parsing programme");
-        ast_root = create_program_node($1, NULL, yylineno);
+        ASTNode *main_func = NULL, *decls = NULL;
+        extract_main_function($1, &decls, &main_func);
+        ast_root = create_program_node(decls, main_func, yylineno);
         generate_code_entry(ast_root);
     }
     ;

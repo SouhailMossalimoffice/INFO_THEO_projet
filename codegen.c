@@ -3,6 +3,8 @@
 #include <string.h>
 #include "ast.h"
 
+void generate_function_declaration(ASTNode* node);
+
 void generate_code(ASTNode* node);
 
 static FILE* output_file;
@@ -21,32 +23,61 @@ void close_codegen() {
     }
 }
 
+// Helper to emit function prototypes
+void emit_function_prototypes(ASTNode* decl) {
+    if (!decl) return;
+    if (decl->type == NODE_SEQUENCE) {
+        emit_function_prototypes(decl->data.sequence.first);
+        emit_function_prototypes(decl->data.sequence.second);
+    } else if (decl->type == NODE_FUNCTION_DECLARATION && strcmp(decl->data.func_decl.name, "main") != 0) {
+        fprintf(output_file, "double %s(", decl->data.func_decl.name);
+        Parameter* param = decl->data.func_decl.parameters;
+        int first = 1;
+        while (param) {
+            if (!first) fprintf(output_file, ", ");
+            fprintf(output_file, "double %s", param->name);
+            param = param->next;
+            first = 0;
+        }
+        fprintf(output_file, ");\n");
+    }
+}
+
+void emit_function_definitions(ASTNode* decl) {
+    if (!decl) return;
+    if (decl->type == NODE_SEQUENCE) {
+        emit_function_definitions(decl->data.sequence.first);
+        emit_function_definitions(decl->data.sequence.second);
+    } else if (decl->type == NODE_FUNCTION_DECLARATION && strcmp(decl->data.func_decl.name, "main") != 0) {
+        generate_function_declaration(decl);
+    }
+}
+
 void generate_program(ASTNode* node) {
     fprintf(output_file, "#include <stdio.h>\n\n");
-    
-    // Generate function declarations
+    // Emit function prototypes
     if (node->type == NODE_PROGRAM) {
-        ASTNode *decl = node->data.program.declarations;
-        while (decl) {
-            if (decl->type == NODE_SEQUENCE) {
-                generate_code(decl->data.sequence.first);
-                decl = decl->data.sequence.second;
-            } else {
-                generate_code(decl);
-                break;
-            }
-        }
+        emit_function_prototypes(node->data.program.declarations);
     }
-    
+    // Emit all non-main function definitions
+    if (node->type == NODE_PROGRAM) {
+        emit_function_definitions(node->data.program.declarations);
+    }
     // Generate main function
     fprintf(output_file, "int main() {\n");
     if (node->type == NODE_PROGRAM && node->data.program.main_function) {
-        generate_code(node->data.program.main_function);
+        // Emit the body of the LazyUi main function here
+        generate_code(node->data.program.main_function->data.func_decl.body);
     }
     fprintf(output_file, "    return 0;\n}\n");
 }
 
 void generate_function_declaration(ASTNode* node) {
+    // Only generate non-main functions
+    if (strcmp(node->data.func_decl.name, "main") == 0) {
+        return;
+    }
+    
     fprintf(output_file, "double %s(", node->data.func_decl.name);
     
     // Generate parameters

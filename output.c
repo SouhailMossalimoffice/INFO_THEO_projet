@@ -1,5 +1,9 @@
 #include <stdio.h>
 
+double add(double a, double b);
+double subtract(double a, double b);
+double multiply(double a, double b);
+double divide(double a, double b);
 double add(double a, double b) {
     return (a + b);
 }
@@ -16,7 +20,7 @@ double divide(double a, double b) {
     return (a / b);
 }
 
-double main() {
+int main() {
     double x = 10.000000;
     double y = 5.000000;
     double sum = add(x, y);
@@ -27,8 +31,5 @@ double main() {
     printf("%f\n", diff);
     printf("%f\n", prod);
     printf("%f\n", quot);
-}
-
-int main() {
     return 0;
 }

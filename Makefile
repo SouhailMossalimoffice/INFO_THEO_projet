@@ -61,5 +61,7 @@ run: $(COMPILER)
 		exit 1; \
 	fi
 	./$(COMPILER) $(file)
+	gcc -o program output.c
+	./program
 
 .PHONY: all clean test run 
