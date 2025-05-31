@@ -329,19 +329,16 @@ char* symbol_type_to_string(SymbolType type) {
 /**
  * Create a program node
  */
-ASTNode* create_program_node(ASTNode** declarations, int decl_count, ASTNode* main_block, int line_number) {
-    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
+ASTNode* create_program_node(ASTNode *declarations, ASTNode *main_function, int line) {
+    ASTNode *node = (ASTNode*)malloc(sizeof(ASTNode));
     if (!node) {
-        fprintf(stderr, "Memory allocation error for program node\n");
-        return NULL;
+        fprintf(stderr, "Error: Memory allocation failed for program node\n");
+        exit(1);
     }
-    
     node->type = NODE_PROGRAM;
-    node->line_number = line_number;
+    node->line_number = line;
     node->data.program.declarations = declarations;
-    node->data.program.decl_count = decl_count;
-    node->data.program.main_block = main_block;
-    
+    node->data.program.main_function = main_function;
     return node;
 }
 
@@ -641,6 +638,23 @@ ASTNode* create_return_node(ASTNode* value, int line_number) {
 }
 
 /**
+ * Create a print node
+ */
+ASTNode* create_print_node(ASTNode *expression, int line) {
+    ASTNode *node = (ASTNode*)malloc(sizeof(ASTNode));
+    if (!node) {
+        fprintf(stderr, "Error: Memory allocation failed for print node\n");
+        exit(1);
+    }
+    
+    node->type = NODE_PRINT;
+    node->line_number = line;
+    node->data.print_stmt.expression = expression;
+    
+    return node;
+}
+
+/**
  * Free an AST node and all its children
  */
 void free_ast_node(ASTNode* node) {
@@ -735,6 +749,10 @@ void free_ast_node(ASTNode* node) {
             if (node->data.field_access.field_name) free(node->data.field_access.field_name);
             break;
             
+        case NODE_PRINT:
+            free_ast_node(node->data.print_stmt.expression);
+            break;
+            
         default:
             break;
     }
@@ -809,25 +827,32 @@ static void print_indent(int indent) {
  * Print the AST for debugging
  */
 void print_ast(ASTNode* node, int indent) {
+    ASTNode *decl;
     if (!node) return;
-    
-    print_indent(indent);
     
     switch (node->type) {
         case NODE_PROGRAM:
-            printf("Program (line %d)\n", node->line_number);
+            print_indent(indent);
+            printf("Program (line %d):\n", node->line_number);
             print_indent(indent + 1);
-            printf("Declarations (%d):\n", node->data.program.decl_count);
-            for (int i = 0; i < node->data.program.decl_count; i++) {
-                print_ast(node->data.program.declarations[i], indent + 2);
+            printf("Declarations:\n");
+            decl = node->data.program.declarations;
+            while (decl) {
+                if (decl->type == NODE_SEQUENCE) {
+                    print_ast(decl->data.sequence.first, indent + 2);
+                    decl = decl->data.sequence.second;
+                } else {
+                    print_ast(decl, indent + 2);
+                    break;
+                }
             }
             print_indent(indent + 1);
             printf("Main Block:\n");
-            if (node->data.program.main_block) {
-                print_ast(node->data.program.main_block, indent + 2);
+            if (node->data.program.main_function) {
+                print_ast(node->data.program.main_function, indent + 2);
             } else {
                 print_indent(indent + 2);
-                printf("(empty)\n");
+                printf("(none)\n");
             }
             break;
             
@@ -1032,6 +1057,13 @@ void print_ast(ASTNode* node, int indent) {
             printf("Field: %s\n", node->data.field_access.field_name);
             break;
             
+        case NODE_PRINT:
+            printf("Print Statement (line %d):\n", node->line_number);
+            print_indent(indent + 1);
+            printf("Expression:\n");
+            print_ast(node->data.print_stmt.expression, indent + 2);
+            break;
+            
         default:
             printf("Unknown Node Type: %d (line %d)\n", node->type, node->line_number);
             break;
@@ -1135,16 +1167,25 @@ static SymbolType get_expression_type(ASTNode* node, SymbolTable* table) {
  * Perform semantic analysis on the AST
  */
 void analyze_ast(ASTNode* node, SymbolTable* table) {
+    ASTNode *decl;
     if (!node) return;
     
     switch (node->type) {
         case NODE_PROGRAM:
-            /* Enter global scope for program */
-            for (int i = 0; i < node->data.program.decl_count; i++) {
-                analyze_ast(node->data.program.declarations[i], table);
+            // Analyze declarations
+            decl = node->data.program.declarations;
+            while (decl) {
+                if (decl->type == NODE_SEQUENCE) {
+                    analyze_ast(decl->data.sequence.first, table);
+                    decl = decl->data.sequence.second;
+                } else {
+                    analyze_ast(decl, table);
+                    break;
+                }
             }
-            if (node->data.program.main_block) {
-                analyze_ast(node->data.program.main_block, table);
+            // Analyze main function
+            if (node->data.program.main_function) {
+                analyze_ast(node->data.program.main_function, table);
             }
             break;
             
@@ -1450,6 +1491,10 @@ void analyze_ast(ASTNode* node, SymbolTable* table) {
                 fprintf(stderr, "Error at line %d: Field access on non-jadwal type\n",
                         node->line_number);
             }
+            break;
+            
+        case NODE_PRINT:
+            analyze_ast(node->data.print_stmt.expression, table);
             break;
             
         default:

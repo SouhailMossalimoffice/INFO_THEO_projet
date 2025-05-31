@@ -170,7 +170,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 38 "LazyUi_Parser.y"
+#line 73 "LazyUi_Parser.y"
 {
     double number;
     char* string;

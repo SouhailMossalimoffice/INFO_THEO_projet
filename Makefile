@@ -38,8 +38,8 @@ $(TEST_OBJ): test_ast.c ast.h
 	$(CC) $(CFLAGS) -c test_ast.c
 
 # Build compiler
-$(COMPILER): $(LEXER_GEN) $(PARSER_GEN) $(AST_OBJ)
-	$(CC) $(CFLAGS) -o $@ $(LEXER_GEN) LazyUi_Parser.tab.c $(AST_OBJ) $(LDFLAGS)
+$(COMPILER): $(LEXER_GEN) $(PARSER_GEN) $(AST_OBJ) codegen.c
+	$(CC) $(CFLAGS) -o $@ $(LEXER_GEN) LazyUi_Parser.tab.c $(AST_OBJ) codegen.c $(LDFLAGS)
 
 # Build test executable
 $(TEST_EXE): $(TEST_OBJ) $(AST_OBJ)

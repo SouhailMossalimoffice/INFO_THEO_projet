@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ast.h"
+#include "codegen.h"
 
 /* Forward declarations for Bison types */
 typedef struct ASTNode ASTNode;
@@ -23,7 +24,7 @@ extern int yylineno;
 void yyerror(const char* s);
 
 SymbolTable *symbol_table;
-ASTNode *ast_root;
+ASTNode *ast_root = NULL;
 
 // Fonction de débogage
 void debug_print(const char* msg) {
@@ -32,6 +33,40 @@ void debug_print(const char* msg) {
 
 void parser_error(const char* msg) {
     fprintf(stderr, "Error at line %d: %s\n", yylineno, msg);
+}
+
+// Helper to append parameter at the end
+Parameter* append_parameter(Parameter* list, Parameter* param) {
+    if (!list) return param;
+    Parameter* curr = list;
+    while (curr->next) curr = curr->next;
+    curr->next = param;
+    return list;
+}
+
+// Helper to flatten argument sequence into array (in correct order)
+void flatten_arguments(ASTNode* seq, ASTNode*** out_args, int* out_count) {
+    int capacity = 8, count = 0;
+    ASTNode** args = malloc(sizeof(ASTNode*) * capacity);
+    // Collect in order for left-recursive sequence
+    while (seq && seq->type == NODE_SEQUENCE) {
+        if (count >= capacity) {
+            capacity *= 2;
+            args = realloc(args, sizeof(ASTNode*) * capacity);
+        }
+        args[count++] = seq->data.sequence.first;
+        seq = seq->data.sequence.second;
+    }
+    if (seq) {
+        if (count >= capacity) {
+            capacity *= 2;
+            args = realloc(args, sizeof(ASTNode*) * capacity);
+        }
+        args[count++] = seq;
+    }
+    // No reversal needed for left-recursive rule
+    *out_args = args;
+    *out_count = count;
 }
 %}
 
@@ -65,36 +100,53 @@ void parser_error(const char* msg) {
 %right TK_FACT
 
 /* Define types for non-terminals */
-%type <ast_node> programme declarations_fonctions declaration_fonction expression expression_arithmetique terme facteur instructions instruction instruction_retour declaration_variable affectation appel_fonction_expr arguments bloc
+%type <ast_node> programme declarations_fonctions declaration_fonction expression expression_arithmetique terme facteur instructions instruction instruction_retour declaration_variable affectation appel_fonction_expr arguments bloc instruction_print
 %type <param_list> parametres parametre
 
 %%
 
 programme
     : declarations_fonctions
+    {
+        debug_print("Parsing programme");
+        ast_root = create_program_node($1, NULL, yylineno);
+        generate_code_entry(ast_root);
+    }
     ;
 
 declarations_fonctions
     : declaration_fonction
+    {
+        $$ = $1;
+    }
     | declarations_fonctions declaration_fonction
+    {
+        $$ = create_sequence_node($1, $2, yylineno);
+    }
     ;
 
 declaration_fonction
     : TK_TAARIF TK_RA9M TK_IDENTIFIANT TK_LPAREN parametres TK_RPAREN bloc
     {
-        debug_print("Function declaration");
+        debug_print("Function declaration with parameters");
         $$ = create_function_declaration_node($3, TYPE_RA9M, $5, $7, yylineno);
     }
     | TK_TAARIF TK_RA9M TK_IDENTIFIANT TK_LPAREN TK_RPAREN bloc
     {
-        debug_print("Function declaration (no params)");
+        debug_print("Function declaration without parameters");
         $$ = create_function_declaration_node($3, TYPE_RA9M, NULL, $6, yylineno);
     }
     ;
 
 parametres
     : parametre
+    {
+        $$ = $1;
+    }
     | parametres TK_COMMA parametre
+    {
+        $$ = append_parameter($1, $3);
+    }
     ;
 
 parametre
@@ -102,14 +154,6 @@ parametre
     {
         debug_print("Found parameter");
         $$ = create_parameter($2, TYPE_RA9M);
-    }
-    ;
-
-bloc
-    : TK_LBRACE instructions TK_RBRACE
-    {
-        debug_print("Found block");
-        $$ = $2;
     }
     ;
 
@@ -133,6 +177,15 @@ instruction
     | declaration_variable { debug_print("Reducing: declaration_variable"); $$ = $1; }
     | affectation { debug_print("Reducing: affectation"); $$ = $1; }
     | appel_fonction_expr TK_SEMICOLON { debug_print("Reducing: function call"); $$ = $1; }
+    | instruction_print { debug_print("Reducing: print statement"); $$ = $1; }
+    ;
+
+instruction_print
+    : TK_KTEB TK_LPAREN expression TK_RPAREN TK_SEMICOLON
+    {
+        debug_print("Found print statement");
+        $$ = create_print_node($3, yylineno);
+    }
     ;
 
 declaration_variable
@@ -210,7 +263,10 @@ appel_fonction_expr
     : TK_IDENTIFIANT TK_LPAREN arguments TK_RPAREN
     {
         debug_print("Found function call with arguments");
-        $$ = create_function_call_node($1, &$3, 1, yylineno);
+        ASTNode** args = NULL;
+        int arg_count = 0;
+        flatten_arguments($3, &args, &arg_count);
+        $$ = create_function_call_node($1, args, arg_count, yylineno);
     }
     | TK_IDENTIFIANT TK_LPAREN TK_RPAREN
     {
@@ -225,6 +281,14 @@ arguments
     {
         debug_print("Found multiple arguments");
         $$ = create_sequence_node($1, $3, yylineno);
+    }
+    ;
+
+bloc
+    : TK_LBRACE instructions TK_RBRACE
+    {
+        debug_print("Found block");
+        $$ = $2;
     }
     ;
 
@@ -263,6 +327,9 @@ int main(int argc, char** argv) {
         debug_print("Printing symbol table");
         printf("Symbol Table:\n");
         print_symbol_table(symbol_table);
+        
+        debug_print("Generating code");
+        generate_code(ast_root);
         
         debug_print("Freeing AST");
         free_ast_node(ast_root);

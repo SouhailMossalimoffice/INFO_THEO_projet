@@ -1,9 +1,30 @@
 taarif ra9m add(ra9m a, ra9m b) {
-    rje3 1;
+    rje3 a + b;
+}
+
+taarif ra9m subtract(ra9m a, ra9m b) {
+    rje3 a - b;
+}
+
+taarif ra9m multiply(ra9m a, ra9m b) {
+    rje3 a * b;
+}
+
+taarif ra9m divide(ra9m a, ra9m b) {
+    rje3 a / b;
 }
 
 taarif ra9m main() {
-    ra9m x = 5;
-    ra9m y = 3;
-    ra9m z = add(x, y);
+    ra9m x = 10;
+    ra9m y = 5;
+    
+    ra9m sum = add(x, y);
+    ra9m diff = subtract(x, y);
+    ra9m prod = multiply(x, y);
+    ra9m quot = divide(x, y);
+    
+    kteb(sum);    // Should print 15
+    kteb(diff);   // Should print 5
+    kteb(prod);   // Should print 50
+    kteb(quot);   // Should print 2
 } 

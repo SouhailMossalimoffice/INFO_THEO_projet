@@ -43,6 +43,8 @@ static void lexer_error(const char* msg) {
 
 [ \t\r\n]+      { /* Ignore whitespace */ }
 
+"//".*          { /* Ignore single-line comments */ }
+
 [a-zA-Z_][a-zA-Z0-9_]*   { 
     debug_print("Found identifier");
     yylval.string = strdup(yytext);

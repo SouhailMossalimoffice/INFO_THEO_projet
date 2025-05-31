@@ -116,7 +116,8 @@ typedef enum {
     NODE_SEQUENCE,
     NODE_PROGRAM,
     NODE_ARRAY_ACCESS,
-    NODE_FIELD_ACCESS
+    NODE_FIELD_ACCESS,
+    NODE_PRINT
 } NodeType;
 
 /* Operator types */
@@ -206,9 +207,8 @@ typedef struct ASTNode {
             ASTNode* second;
         } sequence;
         struct {
-            ASTNode** declarations;
-            int decl_count;
-            ASTNode* main_block;
+            ASTNode* declarations;   // sequence node of function declarations
+            ASTNode* main_function; // main function block
         } program;
         struct {
             ASTNode* array;
@@ -218,6 +218,9 @@ typedef struct ASTNode {
             ASTNode* object;
             char* field_name;
         } field_access;
+        struct {
+            ASTNode* expression;
+        } print_stmt;
     } data;
 } ASTNode;
 
@@ -231,7 +234,7 @@ SymbolEntry* lookup_symbol(SymbolTable *table, const char *name);
 SymbolEntry* lookup_symbol_current_scope(SymbolTable *table, const char *name);
 
 /* Function declarations for AST node creation and management */
-ASTNode* create_program_node(ASTNode **declarations, int declaration_count, ASTNode *main_function, int line);
+ASTNode* create_program_node(ASTNode *declarations, ASTNode *main_function, int line);
 ASTNode* create_var_declaration_node(char *name, SymbolType type, ASTNode *init_expr, int line);
 ASTNode* create_list_declaration_node(char *name, SymbolType element_type, ASTNode **elements, int num_elements, int line);
 ASTNode* create_jadwal_declaration_node(char *name, Field *fields, int line);
@@ -251,6 +254,7 @@ ASTNode* create_block_node(ASTNode **statements, int statement_count, int line);
 ASTNode* create_function_call_node(char *func_name, ASTNode **arguments, int argument_count, int line);
 ASTNode* create_return_node(ASTNode *expr, int line);
 ASTNode* create_sequence_node(ASTNode *first, ASTNode *second, int line);
+ASTNode* create_print_node(ASTNode *expression, int line);
 
 /* Function to free an AST node and all its children */
 void free_ast_node(ASTNode *node);

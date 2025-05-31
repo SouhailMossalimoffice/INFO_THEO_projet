@@ -355,8 +355,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 22
-#define YY_END_OF_BUFFER 23
+#define YY_NUM_RULES 23
+#define YY_END_OF_BUFFER 24
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -364,14 +364,14 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[52] =
+static const flex_int16_t yy_accept[54] =
     {   0,
-        0,    0,    0,    0,    0,    0,    0,    0,   23,   21,
-       11,   11,   17,   18,    7,    5,   19,    6,    8,   13,
-       14,   20,   10,   12,   12,   12,   12,   15,   16,   22,
-       11,    0,   13,    9,   12,   12,   12,   12,   12,   13,
-       12,   12,   12,   12,    4,    2,    3,   12,   12,    1,
-        0
+        0,    0,    0,    0,    0,    0,    0,    0,   24,   22,
+       11,   11,   18,   19,    7,    5,   20,    6,    8,   14,
+       15,   21,   10,   13,   13,   13,   13,   16,   17,   23,
+       11,   12,    0,   14,    9,   13,   13,   13,   13,   13,
+       12,   14,   13,   13,   13,   13,    4,    2,    3,   13,
+       13,    1,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -408,59 +408,61 @@ static const YY_CHAR yy_ec[256] =
 
 static const YY_CHAR yy_meta[31] =
     {   0,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    2,    2,    2,    1,    1,    1,    2,    2,    2,
-        2,    2,    2,    2,    2,    2,    2,    2,    1,    1
+        1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
+        1,    3,    3,    3,    1,    1,    1,    3,    3,    3,
+        3,    3,    3,    3,    3,    3,    3,    3,    1,    1
     } ;
 
-static const flex_int16_t yy_base[54] =
+static const flex_int16_t yy_base[57] =
     {   0,
-        0,    0,    0,    0,    0,    0,    0,    0,   69,   70,
-       29,   31,   70,   70,   70,   70,   70,   70,   70,   25,
-       51,   70,   70,    0,   39,   17,   47,   70,   70,   70,
-       40,   32,   37,   70,    0,   44,   50,   42,   43,   40,
-       41,   34,   46,   31,    0,    0,    0,   34,   26,    0,
-       70,   54,   38
+        0,    0,    0,    0,    0,    0,    0,    0,   73,   74,
+       29,   31,   74,   74,   74,   74,   74,   74,   61,   25,
+       54,   74,   74,    0,   42,   17,   50,   74,   74,   74,
+       40,    0,   32,   37,   74,    0,   47,   53,   45,   46,
+        0,   40,   44,   37,   49,   34,    0,    0,    0,   36,
+       26,    0,   74,   54,   37,   57
     } ;
 
-static const flex_int16_t yy_def[54] =
+static const flex_int16_t yy_def[57] =
     {   0,
-       51,    1,   52,   52,   52,   52,   52,   52,   51,   51,
-       51,   51,   51,   51,   51,   51,   51,   51,   51,   51,
-       51,   51,   51,   53,   53,   53,   53,   51,   51,   51,
-       51,   51,   51,   51,   53,   53,   53,   53,   53,   51,
+       53,    1,   54,   54,   54,   54,   54,   54,   53,   53,
        53,   53,   53,   53,   53,   53,   53,   53,   53,   53,
-        0,   51,   51
+       53,   53,   53,   55,   55,   55,   55,   53,   53,   53,
+       53,   56,   53,   53,   53,   55,   55,   55,   55,   55,
+       56,   53,   55,   55,   55,   55,   55,   55,   55,   55,
+       55,   55,    0,   53,   53,   53
     } ;
 
-static const flex_int16_t yy_nxt[101] =
+static const flex_int16_t yy_nxt[105] =
     {   0,
        10,   11,   12,   13,   14,   15,   16,   17,   18,   10,
        19,   20,   20,   20,   21,   22,   23,   24,   24,   24,
        24,   24,   24,   24,   25,   24,   26,   27,   28,   29,
-       31,   31,   31,   31,   32,   37,   33,   33,   33,   35,
-       38,   31,   31,   40,   40,   40,   32,   50,   33,   33,
-       33,   40,   40,   40,   30,   30,   49,   48,   47,   46,
-       45,   44,   43,   42,   41,   39,   36,   34,   51,    9,
-       51,   51,   51,   51,   51,   51,   51,   51,   51,   51,
-       51,   51,   51,   51,   51,   51,   51,   51,   51,   51,
-       51,   51,   51,   51,   51,   51,   51,   51,   51,   51
+       31,   31,   31,   31,   33,   38,   34,   34,   34,   36,
+       39,   31,   31,   42,   42,   42,   33,   52,   34,   34,
+       34,   42,   42,   42,   30,   30,   30,   41,   51,   41,
+       50,   49,   48,   47,   46,   45,   44,   43,   40,   37,
+       35,   32,   53,    9,   53,   53,   53,   53,   53,   53,
+       53,   53,   53,   53,   53,   53,   53,   53,   53,   53,
+       53,   53,   53,   53,   53,   53,   53,   53,   53,   53,
 
+       53,   53,   53,   53
     } ;
 
-static const flex_int16_t yy_chk[101] =
+static const flex_int16_t yy_chk[105] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-       11,   11,   12,   12,   20,   26,   20,   20,   20,   53,
-       26,   31,   31,   32,   32,   32,   33,   49,   33,   33,
-       33,   40,   40,   40,   52,   52,   48,   44,   43,   42,
-       41,   39,   38,   37,   36,   27,   25,   21,    9,   51,
-       51,   51,   51,   51,   51,   51,   51,   51,   51,   51,
-       51,   51,   51,   51,   51,   51,   51,   51,   51,   51,
-       51,   51,   51,   51,   51,   51,   51,   51,   51,   51
+       11,   11,   12,   12,   20,   26,   20,   20,   20,   55,
+       26,   31,   31,   33,   33,   33,   34,   51,   34,   34,
+       34,   42,   42,   42,   54,   54,   54,   56,   50,   56,
+       46,   45,   44,   43,   40,   39,   38,   37,   27,   25,
+       21,   19,    9,   53,   53,   53,   53,   53,   53,   53,
+       53,   53,   53,   53,   53,   53,   53,   53,   53,   53,
+       53,   53,   53,   53,   53,   53,   53,   53,   53,   53,
 
+       53,   53,   53,   53
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -498,9 +500,9 @@ static void debug_print(const char* msg) {
 static void lexer_error(const char* msg) {
     fprintf(stderr, "Error at line %d: %s\n", yylineno, msg);
 }
-#line 501 "lex.yy.c"
-
 #line 503 "lex.yy.c"
+
+#line 505 "lex.yy.c"
 
 #define INITIAL 0
 #define STRING 1
@@ -723,7 +725,7 @@ YY_DECL
 #line 29 "LazyUi_Analex.l"
 
 
-#line 726 "lex.yy.c"
+#line 728 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -750,13 +752,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 52 )
+				if ( yy_current_state >= 54 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 70 );
+		while ( yy_base[yy_current_state] != 74 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -839,67 +841,72 @@ YY_RULE_SETUP
 case 12:
 YY_RULE_SETUP
 #line 46 "LazyUi_Analex.l"
+{ /* Ignore single-line comments */ }
+	YY_BREAK
+case 13:
+YY_RULE_SETUP
+#line 48 "LazyUi_Analex.l"
 { 
     debug_print("Found identifier");
     yylval.string = strdup(yytext);
     return TK_IDENTIFIANT; 
 }
 	YY_BREAK
-case 13:
+case 14:
 YY_RULE_SETUP
-#line 52 "LazyUi_Analex.l"
+#line 54 "LazyUi_Analex.l"
 { 
     debug_print("Found number");
     yylval.number = atof(yytext);
     return TK_NUMBER; 
 }
 	YY_BREAK
-case 14:
-YY_RULE_SETUP
-#line 58 "LazyUi_Analex.l"
-{ debug_print("Found TK_COLON"); return TK_COLON; }
-	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 59 "LazyUi_Analex.l"
-{ debug_print("Found TK_LBRACE"); return TK_LBRACE; }
+#line 60 "LazyUi_Analex.l"
+{ debug_print("Found TK_COLON"); return TK_COLON; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 60 "LazyUi_Analex.l"
-{ debug_print("Found TK_RBRACE"); return TK_RBRACE; }
+#line 61 "LazyUi_Analex.l"
+{ debug_print("Found TK_LBRACE"); return TK_LBRACE; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 61 "LazyUi_Analex.l"
-{ debug_print("Found TK_LPAREN"); return TK_LPAREN; }
+#line 62 "LazyUi_Analex.l"
+{ debug_print("Found TK_RBRACE"); return TK_RBRACE; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 62 "LazyUi_Analex.l"
-{ debug_print("Found TK_RPAREN"); return TK_RPAREN; }
+#line 63 "LazyUi_Analex.l"
+{ debug_print("Found TK_LPAREN"); return TK_LPAREN; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 63 "LazyUi_Analex.l"
-{ debug_print("Found TK_COMMA"); return TK_COMMA; }
+#line 64 "LazyUi_Analex.l"
+{ debug_print("Found TK_RPAREN"); return TK_RPAREN; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 64 "LazyUi_Analex.l"
-{ debug_print("Found TK_SEMICOLON"); return TK_SEMICOLON; }
+#line 65 "LazyUi_Analex.l"
+{ debug_print("Found TK_COMMA"); return TK_COMMA; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 66 "LazyUi_Analex.l"
-{ printf("UNRECOGNIZED: %s (ASCII: %d)\n", yytext, yytext[0]); }
+{ debug_print("Found TK_SEMICOLON"); return TK_SEMICOLON; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 68 "LazyUi_Analex.l"
+{ printf("UNRECOGNIZED: %s (ASCII: %d)\n", yytext, yytext[0]); }
+	YY_BREAK
+case 23:
+YY_RULE_SETUP
+#line 70 "LazyUi_Analex.l"
 ECHO;
 	YY_BREAK
-#line 902 "lex.yy.c"
+#line 909 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(STRING):
 case YY_STATE_EOF(COMMENT_LINE):
@@ -1199,7 +1206,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 52 )
+			if ( yy_current_state >= 54 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1227,11 +1234,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 52 )
+		if ( yy_current_state >= 54 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 51);
+	yy_is_jam = (yy_current_state == 53);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1907,6 +1914,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 68 "LazyUi_Analex.l"
+#line 70 "LazyUi_Analex.l"
 
 
