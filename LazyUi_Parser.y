@@ -2,6 +2,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "ast.h"
+
+/* Forward declarations for Bison types */
+typedef struct ASTNode ASTNode;
+typedef struct Parameter Parameter;
+typedef struct Field Field;
+
+/* Structure pour le for header */
+struct ForHeaderData {
+    ASTNode* init;
+    ASTNode* cond;
+    ASTNode* update;
+};
 
 extern int yylex();
 extern int yyparse();
@@ -9,23 +22,38 @@ extern FILE* yyin;
 extern int yylineno;
 void yyerror(const char* s);
 
-%}
+SymbolTable *symbol_table;
+ASTNode *ast_root;
 
-/* Tokens from lexical analyzer */
-%token TK_IDENTIFIANT TK_RA9M TK_KTABA TK_WA9ILA TK_LISTA TK_JADWAL
-%token TK_SEMICOLON TK_LBRACKET TK_RBRACKET TK_LBRACE TK_RBRACE TK_COLON
-%token TK_AFFECTATION TK_COMMA TK_DOT TK_LPAREN TK_RPAREN TK_FACT
-%token TK_NON TK_ET TK_OU TK_EQUAL TK_DIFF TK_SUP TK_INF
-%token TK_SUP_EQ TK_INF_EQ TK_INT_DIV TK_NUMBER TK_STRING TK_ILA
-%token TK_WILAKAN TK_ILAMAKANCH TK_MN TK_MA7ED TK_TAWZI3 TK_KTEB TK_DAKHAL
-%token TK_TAARIF TK_RJE3 TK_MAIN TK_W TK_WLA TK_MACHI TK_L TK_B
-%token TK_ADD TK_SUB TK_MUL TK_DIV TK_HITACH TK_FI_HALAT TK_KML_HTAL
-%token TK_DIR TK_FI TK_JARRAB TK_L_KOL TK_ZID TK_MSAH TK_HTAL TK_WLALA
+// Fonction de débogage
+void debug_print(const char* msg) {
+    fprintf(stderr, "DEBUG: %s\n", msg);
+}
+
+void parser_error(const char* msg) {
+    fprintf(stderr, "Error at line %d: %s\n", yylineno, msg);
+}
+%}
 
 %union {
     double number;
     char* string;
+    struct ASTNode* ast_node;
+    struct Parameter* param_list;
 }
+
+/* Tokens from lexical analyzer */
+%token <string> TK_IDENTIFIANT TK_STRING
+%token <number> TK_NUMBER
+%token TK_RA9M TK_KTABA TK_WA9ILA TK_LISTA TK_JADWAL
+%token TK_SEMICOLON TK_LBRACKET TK_RBRACKET TK_LBRACE TK_RBRACE TK_COLON
+%token TK_AFFECTATION TK_COMMA TK_DOT TK_LPAREN TK_RPAREN TK_FACT
+%token TK_NON TK_ET TK_OU TK_EQUAL TK_DIFF TK_SUP TK_INF
+%token TK_SUP_EQ TK_INF_EQ TK_INT_DIV TK_ILA
+%token TK_WILAKAN TK_ILAMAKANCH TK_MN TK_MA7ED TK_TAWZI3 TK_KTEB TK_DAKHAL
+%token TK_TAARIF TK_RJE3 TK_MAIN TK_W TK_WLA TK_MACHI TK_L TK_B
+%token TK_ADD TK_SUB TK_MUL TK_DIV TK_HITACH TK_FI_HALAT TK_KML_HTAL
+%token TK_DIR TK_FI TK_JARRAB TK_L_KOL TK_ZID TK_MSAH TK_HTAL TK_WLALA
 
 /* Operator precedence */
 %left TK_OU
@@ -36,53 +64,14 @@ void yyerror(const char* s);
 %left TK_MUL TK_DIV TK_INT_DIV
 %right TK_FACT
 
+/* Define types for non-terminals */
+%type <ast_node> programme declarations_fonctions declaration_fonction expression expression_arithmetique terme facteur instructions instruction instruction_retour declaration_variable affectation appel_fonction_expr arguments bloc
+%type <param_list> parametres parametre
+
 %%
 
 programme
-    : declarations_variables declarations_fonctions programme_principal
-    | declarations_fonctions programme_principal
-    | programme_principal
-    ;
-
-declarations_variables
-    : declaration_variable
-    | declarations_variables declaration_variable
-    ;
-
-declaration_variable
-    : type TK_IDENTIFIANT TK_SEMICOLON
-    | type TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON
-    | declaration_liste
-    | declaration_jadwal
-    ;
-
-type
-    : TK_RA9M
-    | TK_KTABA
-    | TK_WA9ILA
-    ;
-
-declaration_liste
-    : TK_LISTA TK_IDENTIFIANT TK_AFFECTATION TK_LBRACKET liste_valeurs TK_RBRACKET TK_SEMICOLON
-    | TK_LISTA TK_IDENTIFIANT TK_AFFECTATION TK_LBRACKET TK_RBRACKET TK_SEMICOLON
-    ;
-
-liste_valeurs
-    : expression
-    | liste_valeurs TK_COMMA expression
-    ;
-
-declaration_jadwal
-    : TK_JADWAL TK_IDENTIFIANT TK_LBRACE champs_jadwal TK_RBRACE
-    ;
-
-champs_jadwal
-    : champ_jadwal
-    | champs_jadwal champ_jadwal
-    ;
-
-champ_jadwal
-    : type TK_IDENTIFIANT TK_SEMICOLON
+    : declarations_fonctions
     ;
 
 declarations_fonctions
@@ -91,8 +80,16 @@ declarations_fonctions
     ;
 
 declaration_fonction
-    : TK_TAARIF TK_IDENTIFIANT TK_LPAREN parametres TK_RPAREN TK_LBRACE bloc TK_RBRACE
-    | TK_TAARIF TK_IDENTIFIANT TK_LPAREN TK_RPAREN TK_LBRACE bloc TK_RBRACE
+    : TK_TAARIF TK_RA9M TK_IDENTIFIANT TK_LPAREN parametres TK_RPAREN bloc
+    {
+        debug_print("Function declaration");
+        $$ = create_function_declaration_node($3, TYPE_RA9M, $5, $7, yylineno);
+    }
+    | TK_TAARIF TK_RA9M TK_IDENTIFIANT TK_LPAREN TK_RPAREN bloc
+    {
+        debug_print("Function declaration (no params)");
+        $$ = create_function_declaration_node($3, TYPE_RA9M, NULL, $6, yylineno);
+    }
     ;
 
 parametres
@@ -101,134 +98,144 @@ parametres
     ;
 
 parametre
-    : type TK_IDENTIFIANT
+    : TK_RA9M TK_IDENTIFIANT
+    {
+        debug_print("Found parameter");
+        $$ = create_parameter($2, TYPE_RA9M);
+    }
     ;
 
 bloc
-    : instructions
-    | /* empty */
+    : TK_LBRACE instructions TK_RBRACE
+    {
+        debug_print("Found block");
+        $$ = $2;
+    }
     ;
 
 instructions
-    : instruction
+    : /* empty */
+    {
+        $$ = NULL;
+    }
+    | instruction
+    {
+        $$ = $1;
+    }
     | instructions instruction
+    {
+        $$ = create_sequence_node($1, $2, yylineno);
+    }
     ;
 
 instruction
-    : affectation
-    | appel_fonction_expr TK_SEMICOLON
-    | instruction_condition
-    | instruction_boucle
-    | instruction_retour
-    | operation_jadwal
-    | instruction_io
+    : instruction_retour { debug_print("Reducing: instruction_retour"); $$ = $1; }
+    | declaration_variable { debug_print("Reducing: declaration_variable"); $$ = $1; }
+    | affectation { debug_print("Reducing: affectation"); $$ = $1; }
+    | appel_fonction_expr TK_SEMICOLON { debug_print("Reducing: function call"); $$ = $1; }
     ;
 
-instruction_retour
-    : TK_RJE3 expression TK_SEMICOLON
-    ;
-
-programme_principal
-    : TK_MAIN TK_LBRACE bloc TK_RBRACE
+declaration_variable
+    : TK_RA9M TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON
+    {
+        debug_print("Found variable declaration with initialization");
+        $$ = create_var_declaration_node($2, TYPE_RA9M, $4, yylineno);
+    }
     ;
 
 affectation
     : TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON
-    | TK_IDENTIFIANT acces_element TK_AFFECTATION expression TK_SEMICOLON
+    {
+        debug_print("Found assignment");
+        $$ = create_assignment_node(create_identifier_node($1, yylineno), $3, yylineno);
+    }
     ;
 
-acces_element
-    : TK_DOT TK_IDENTIFIANT
-    | TK_LBRACKET expression TK_RBRACKET
+instruction_retour
+    : TK_RJE3 expression TK_SEMICOLON
+    {
+        debug_print("Reducing: instruction_retour (rje3)");
+        $$ = create_return_node($2, yylineno);
+    }
     ;
 
 expression
-    : expression_logique
-    ;
-
-expression_logique
-    : expression_comparison
-    | expression_logique TK_ET expression_comparison
-    | expression_logique TK_OU expression_comparison
-    | TK_NON expression_logique
-    ;
-
-
-expression_comparison
-    : expression_arithmetique
-    | expression_comparison TK_EQUAL expression_comparison
-    | expression_comparison TK_DIFF expression_comparison
-    | expression_comparison TK_SUP expression_comparison
-    | expression_comparison TK_INF expression_comparison
-    | expression_comparison TK_SUP_EQ expression_comparison
-    | expression_comparison TK_INF_EQ expression_comparison
+    : expression_arithmetique { $$ = $1; }
     ;
 
 expression_arithmetique
-    : terme
+    : terme { $$ = $1; }
     | expression_arithmetique TK_ADD terme
+    {
+        debug_print("Found addition");
+        $$ = create_binary_op_node(OP_ADD, $1, $3, yylineno);
+    }
     | expression_arithmetique TK_SUB terme
+    {
+        debug_print("Found subtraction");
+        $$ = create_binary_op_node(OP_SUB, $1, $3, yylineno);
+    }
     ;
 
 terme
-    : facteur
+    : facteur { $$ = $1; }
     | terme TK_MUL facteur
+    {
+        debug_print("Found multiplication");
+        $$ = create_binary_op_node(OP_MUL, $1, $3, yylineno);
+    }
     | terme TK_DIV facteur
-    | terme TK_INT_DIV facteur
+    {
+        debug_print("Found division");
+        $$ = create_binary_op_node(OP_DIV, $1, $3, yylineno);
+    }
     ;
 
 facteur
-    : valeur
-    | TK_LPAREN expression TK_RPAREN
-    | TK_FACT facteur
-    | appel_fonction_expr
-    ;
-
-valeur
     : TK_NUMBER
-    | TK_STRING
-    | TK_IDENTIFIANT /* Add this to make identifiers a valid value */
-    | TK_IDENTIFIANT acces_element /* Add this for struct/array access */
+    {
+        debug_print("Found number");
+        $$ = create_number_node($1, yylineno);
+    }
+    | TK_IDENTIFIANT
+    {
+        debug_print("Found identifier");
+        $$ = create_identifier_node($1, yylineno);
+    }
+    | TK_LPAREN expression TK_RPAREN { $$ = $2; }
+    | appel_fonction_expr { $$ = $1; }
     ;
-
 
 appel_fonction_expr
     : TK_IDENTIFIANT TK_LPAREN arguments TK_RPAREN
+    {
+        debug_print("Found function call with arguments");
+        $$ = create_function_call_node($1, &$3, 1, yylineno);
+    }
     | TK_IDENTIFIANT TK_LPAREN TK_RPAREN
+    {
+        debug_print("Found function call without arguments");
+        $$ = create_function_call_node($1, NULL, 0, yylineno);
+    }
     ;
 
 arguments
-    : expression
+    : expression { $$ = $1; }
     | arguments TK_COMMA expression
-    ;
-
-instruction_condition
-    : TK_ILA TK_LPAREN expression TK_RPAREN TK_LBRACE bloc TK_RBRACE
-    | TK_ILA TK_LPAREN expression TK_RPAREN TK_LBRACE bloc TK_RBRACE TK_ILAMAKANCH TK_LBRACE bloc TK_RBRACE
-    | TK_ILA TK_LPAREN expression TK_RPAREN TK_LBRACE bloc TK_RBRACE TK_WILAKAN TK_LPAREN expression TK_RPAREN TK_LBRACE bloc TK_RBRACE
-    ;
-
-instruction_boucle
-    : TK_MA7ED TK_LPAREN expression TK_RPAREN TK_LBRACE bloc TK_RBRACE
-    | TK_MN TK_LPAREN expression TK_RPAREN TK_L TK_LPAREN expression TK_RPAREN TK_B TK_LPAREN expression TK_RPAREN TK_LBRACE bloc TK_RBRACE
-    ;
-
-operation_jadwal
-    : TK_IDENTIFIANT TK_DOT TK_IDENTIFIANT TK_LPAREN arguments TK_RPAREN TK_SEMICOLON
-    ;
-
-instruction_io
-    : TK_KTEB TK_LPAREN arguments TK_RPAREN TK_SEMICOLON
-    | TK_DAKHAL TK_LPAREN TK_IDENTIFIANT TK_RPAREN TK_SEMICOLON
+    {
+        debug_print("Found multiple arguments");
+        $$ = create_sequence_node($1, $3, yylineno);
+    }
     ;
 
 %%
 
 void yyerror(const char* s) {
-    fprintf(stderr, "Error at line %d: %s\n", yylineno, s);
+    parser_error(s);
 }
 
 int main(int argc, char** argv) {
+    debug_print("Starting parser");
     if (argc > 1) {
         FILE* file = fopen(argv[1], "r");
         if (!file) {
@@ -238,10 +245,35 @@ int main(int argc, char** argv) {
         yyin = file;
     }
     
-    yyparse();
+    debug_print("Creating symbol table");
+    symbol_table = create_symbol_table();
     
-    if (argc > 1) {
+    debug_print("Starting parsing");
+    int result = yyparse();
+    debug_print("Parsing completed");
+    
+    if (result == 0 && ast_root) {
+        debug_print("Analyzing AST");
+        analyze_ast(ast_root, symbol_table);
+        
+        debug_print("Printing AST");
+        printf("AST Structure:\n");
+        print_ast(ast_root, 0);
+        
+        debug_print("Printing symbol table");
+        printf("Symbol Table:\n");
+        print_symbol_table(symbol_table);
+        
+        debug_print("Freeing AST");
+        free_ast_node(ast_root);
+    }
+    
+    debug_print("Freeing symbol table");
+    free_symbol_table(symbol_table);
+    
+    if (yyin != stdin) {
         fclose(yyin);
     }
-    return 0;
+    
+    return result;
 } 

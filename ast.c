@@ -144,13 +144,13 @@ void exit_scope(SymbolTable *table) {
 /**
  * Add a symbol to the current scope
  */
-SymbolEntry* add_symbol(SymbolTable *table, char *name, SymbolType type, SymbolCategory category, int line) {
+SymbolEntry* add_symbol(SymbolTable* table, const char* name, SymbolType type, SymbolCategory category, int line) {
     if (!table || !table->current_scope || !name) {
         return NULL;
     }
     
     /* Check if symbol already exists in current scope */
-    SymbolEntry *existing = lookup_symbol_current_scope(table, name);
+    SymbolEntry* existing = lookup_symbol_current_scope(table, name);
     if (existing) {
         fprintf(stderr, "Error: Symbol '%s' already defined in current scope at line %d\n", 
                 name, existing->line_defined);
@@ -158,10 +158,10 @@ SymbolEntry* add_symbol(SymbolTable *table, char *name, SymbolType type, SymbolC
     }
     
     /* Create new symbol entry */
-    SymbolEntry *entry = (SymbolEntry*)malloc(sizeof(SymbolEntry));
+    SymbolEntry* entry = (SymbolEntry*)malloc(sizeof(SymbolEntry));
     if (!entry) {
         fprintf(stderr, "Memory allocation error for symbol entry\n");
-        exit(1);
+        return NULL;
     }
     
     entry->name = strdup(name);
@@ -201,7 +201,7 @@ SymbolEntry* add_symbol(SymbolTable *table, char *name, SymbolType type, SymbolC
     if (!table->current_scope->entries) {
         table->current_scope->entries = entry;
     } else {
-        SymbolEntry *current = table->current_scope->entries;
+        SymbolEntry* current = table->current_scope->entries;
         while (current->next) {
             current = current->next;
         }
@@ -214,12 +214,12 @@ SymbolEntry* add_symbol(SymbolTable *table, char *name, SymbolType type, SymbolC
 /**
  * Look up a symbol in current scope and all parent scopes
  */
-SymbolEntry* lookup_symbol(SymbolTable *table, char *name) {
+SymbolEntry* lookup_symbol(SymbolTable* table, const char* name) {
     if (!table || !name) return NULL;
     
-    Scope *scope = table->current_scope;
+    Scope* scope = table->current_scope;
     while (scope) {
-        SymbolEntry *entry = scope->entries;
+        SymbolEntry* entry = scope->entries;
         while (entry) {
             if (strcmp(entry->name, name) == 0) {
                 return entry;
@@ -235,10 +235,10 @@ SymbolEntry* lookup_symbol(SymbolTable *table, char *name) {
 /**
  * Look up a symbol in current scope only
  */
-SymbolEntry* lookup_symbol_current_scope(SymbolTable *table, char *name) {
+SymbolEntry* lookup_symbol_current_scope(SymbolTable* table, const char* name) {
     if (!table || !table->current_scope || !name) return NULL;
     
-    SymbolEntry *entry = table->current_scope->entries;
+    SymbolEntry* entry = table->current_scope->entries;
     while (entry) {
         if (strcmp(entry->name, name) == 0) {
             return entry;
@@ -329,18 +329,18 @@ char* symbol_type_to_string(SymbolType type) {
 /**
  * Create a program node
  */
-ASTNode* create_program_node(ASTNode **declarations, int declaration_count, ASTNode *main_function, int line) {
-    ASTNode *node = (ASTNode*)malloc(sizeof(ASTNode));
+ASTNode* create_program_node(ASTNode** declarations, int decl_count, ASTNode* main_block, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
     if (!node) {
-        fprintf(stderr, "Memory allocation error for AST node\n");
-        exit(1);
+        fprintf(stderr, "Memory allocation error for program node\n");
+        return NULL;
     }
     
     node->type = NODE_PROGRAM;
+    node->line_number = line_number;
     node->data.program.declarations = declarations;
-    node->data.program.declaration_count = declaration_count;
-    node->data.program.main_function = main_function;
-    node->line_number = line;
+    node->data.program.decl_count = decl_count;
+    node->data.program.main_block = main_block;
     
     return node;
 }
@@ -348,53 +348,53 @@ ASTNode* create_program_node(ASTNode **declarations, int declaration_count, ASTN
 /**
  * Create a variable declaration node
  */
-ASTNode* create_var_declaration_node(char *name, SymbolType type, ASTNode *init_expr, int line) {
-    ASTNode *node = (ASTNode*)malloc(sizeof(ASTNode));
+ASTNode* create_var_declaration_node(char* name, SymbolType type, ASTNode* initializer, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
     if (!node) {
-        fprintf(stderr, "Memory allocation error for AST node\n");
-        exit(1);
+        fprintf(stderr, "Memory allocation error for variable declaration node\n");
+        return NULL;
     }
     
     node->type = NODE_VAR_DECLARATION;
+    node->line_number = line_number;
     node->data.var_decl.name = strdup(name);
-    node->data.var_decl.var_type = type;
-    node->data.var_decl.init_expr = init_expr;
+    node->data.var_decl.type = type;
+    node->data.var_decl.initializer = initializer;
     node->data.var_decl.symbol = NULL; /* Will be set during semantic analysis */
-    node->line_number = line;
     
     return node;
 }
 
 /**
- * Create a number literal node
+ * Create a number node
  */
-ASTNode* create_number_node(double value, int line) {
-    ASTNode *node = (ASTNode*)malloc(sizeof(ASTNode));
+ASTNode* create_number_node(double value, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
     if (!node) {
-        fprintf(stderr, "Memory allocation error for AST node\n");
-        exit(1);
+        fprintf(stderr, "Memory allocation error for number node\n");
+        return NULL;
     }
     
     node->type = NODE_NUMBER;
+    node->line_number = line_number;
     node->data.number_value = value;
-    node->line_number = line;
     
     return node;
 }
 
 /**
- * Create a string literal node
+ * Create a string node
  */
-ASTNode* create_string_node(char *value, int line) {
-    ASTNode *node = (ASTNode*)malloc(sizeof(ASTNode));
+ASTNode* create_string_node(char* value, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
     if (!node) {
-        fprintf(stderr, "Memory allocation error for AST node\n");
-        exit(1);
+        fprintf(stderr, "Memory allocation error for string node\n");
+        return NULL;
     }
     
     node->type = NODE_STRING;
+    node->line_number = line_number;
     node->data.string_value = strdup(value);
-    node->line_number = line;
     
     return node;
 }
@@ -402,17 +402,16 @@ ASTNode* create_string_node(char *value, int line) {
 /**
  * Create an identifier node
  */
-ASTNode* create_identifier_node(char *name, int line) {
-    ASTNode *node = (ASTNode*)malloc(sizeof(ASTNode));
+ASTNode* create_identifier_node(char* name, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
     if (!node) {
-        fprintf(stderr, "Memory allocation error for AST node\n");
-        exit(1);
+        fprintf(stderr, "Memory allocation error for identifier node\n");
+        return NULL;
     }
     
     node->type = NODE_IDENTIFIER;
-    node->data.identifier.name = strdup(name);
-    node->data.identifier.symbol = NULL; /* Will be set during semantic analysis */
-    node->line_number = line;
+    node->line_number = line_number;
+    node->data.identifier = strdup(name);
     
     return node;
 }
@@ -420,18 +419,18 @@ ASTNode* create_identifier_node(char *name, int line) {
 /**
  * Create a binary operation node
  */
-ASTNode* create_binary_op_node(BinaryOpType op, ASTNode *left, ASTNode *right, int line) {
-    ASTNode *node = (ASTNode*)malloc(sizeof(ASTNode));
+ASTNode* create_binary_op_node(OperatorType op, ASTNode* left, ASTNode* right, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
     if (!node) {
-        fprintf(stderr, "Memory allocation error for AST node\n");
-        exit(1);
+        fprintf(stderr, "Memory allocation error for binary operation node\n");
+        return NULL;
     }
     
     node->type = NODE_BINARY_OP;
+    node->line_number = line_number;
     node->data.binary_op.op = op;
     node->data.binary_op.left = left;
     node->data.binary_op.right = right;
-    node->line_number = line;
     
     return node;
 }
@@ -439,17 +438,17 @@ ASTNode* create_binary_op_node(BinaryOpType op, ASTNode *left, ASTNode *right, i
 /**
  * Create a unary operation node
  */
-ASTNode* create_unary_op_node(UnaryOpType op, ASTNode *operand, int line) {
-    ASTNode *node = (ASTNode*)malloc(sizeof(ASTNode));
+ASTNode* create_unary_op_node(OperatorType op, ASTNode* operand, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
     if (!node) {
-        fprintf(stderr, "Memory allocation error for AST node\n");
-        exit(1);
+        fprintf(stderr, "Memory allocation error for unary operation node\n");
+        return NULL;
     }
     
     node->type = NODE_UNARY_OP;
+    node->line_number = line_number;
     node->data.unary_op.op = op;
     node->data.unary_op.operand = operand;
-    node->line_number = line;
     
     return node;
 }
@@ -457,57 +456,186 @@ ASTNode* create_unary_op_node(UnaryOpType op, ASTNode *operand, int line) {
 /**
  * Create an assignment node
  */
-ASTNode* create_assignment_node(ASTNode *target, ASTNode *value, int line) {
-    ASTNode *node = (ASTNode*)malloc(sizeof(ASTNode));
+ASTNode* create_assignment_node(ASTNode* target, ASTNode* value, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
     if (!node) {
-        fprintf(stderr, "Memory allocation error for AST node\n");
-        exit(1);
+        fprintf(stderr, "Memory allocation error for assignment node\n");
+        return NULL;
     }
     
-    node->type = NODE_ASSIGN;
-    node->data.assign.target = target;
-    node->data.assign.value = value;
-    node->line_number = line;
+    node->type = NODE_ASSIGNMENT;
+    node->line_number = line_number;
+    node->data.assignment.target = target;
+    node->data.assignment.value = value;
     
     return node;
 }
 
 /**
- * Create a list declaration node
+ * Create a function call node
  */
-ASTNode* create_list_declaration_node(char *name, SymbolType element_type, ASTNode **elements, int num_elements, int line) {
-    ASTNode *node = (ASTNode*)malloc(sizeof(ASTNode));
+ASTNode* create_function_call_node(char* name, ASTNode** arguments, int arg_count, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
     if (!node) {
-        fprintf(stderr, "Memory allocation error for AST node\n");
-        exit(1);
+        fprintf(stderr, "Memory allocation error for function call node\n");
+        return NULL;
     }
     
-    node->type = NODE_LIST_DECLARATION;
-    node->data.list_decl.name = strdup(name);
-    node->data.list_decl.element_type = element_type;
-    node->data.list_decl.elements = elements;
-    node->data.list_decl.num_elements = num_elements;
-    node->data.list_decl.symbol = NULL; /* Will be set during semantic analysis */
-    node->line_number = line;
+    node->type = NODE_FUNCTION_CALL;
+    node->line_number = line_number;
+    node->data.func_call.name = strdup(name);
+    node->data.func_call.arguments = arguments;
+    node->data.func_call.arg_count = arg_count;
+    node->data.func_call.symbol = NULL; /* Will be set during semantic analysis */
     
     return node;
 }
 
 /**
- * Create a jadwal declaration node
+ * Create a function declaration node
  */
-ASTNode* create_jadwal_declaration_node(char *name, Field *fields, int line) {
-    ASTNode *node = (ASTNode*)malloc(sizeof(ASTNode));
+ASTNode* create_function_declaration_node(char* name, SymbolType return_type, Parameter* parameters, ASTNode* body, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
     if (!node) {
-        fprintf(stderr, "Memory allocation error for AST node\n");
-        exit(1);
+        fprintf(stderr, "Memory allocation error for function declaration node\n");
+        return NULL;
     }
     
-    node->type = NODE_JADWAL_DECLARATION;
-    node->data.jadwal_decl.name = strdup(name);
-    node->data.jadwal_decl.fields = fields;
-    node->data.jadwal_decl.symbol = NULL; /* Will be set during semantic analysis */
-    node->line_number = line;
+    node->type = NODE_FUNCTION_DECLARATION;
+    node->line_number = line_number;
+    node->data.func_decl.name = strdup(name);
+    node->data.func_decl.return_type = return_type;
+    node->data.func_decl.parameters = parameters;
+    node->data.func_decl.body = body;
+    node->data.func_decl.symbol = NULL; /* Will be set during semantic analysis */
+    
+    return node;
+}
+
+/**
+ * Create a sequence node
+ */
+ASTNode* create_sequence_node(ASTNode* first, ASTNode* second, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
+    if (!node) {
+        fprintf(stderr, "Memory allocation error for sequence node\n");
+        return NULL;
+    }
+    
+    node->type = NODE_SEQUENCE;
+    node->line_number = line_number;
+    node->data.sequence.first = first;
+    node->data.sequence.second = second;
+    
+    return node;
+}
+
+/**
+ * Create an array access node
+ */
+ASTNode* create_array_access_node(ASTNode* array, ASTNode* index, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
+    if (!node) {
+        fprintf(stderr, "Memory allocation error for array access node\n");
+        return NULL;
+    }
+    
+    node->type = NODE_ARRAY_ACCESS;
+    node->line_number = line_number;
+    node->data.array_access.array = array;
+    node->data.array_access.index = index;
+    
+    return node;
+}
+
+/**
+ * Create a field access node
+ */
+ASTNode* create_field_access_node(ASTNode* object, char* field_name, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
+    if (!node) {
+        fprintf(stderr, "Memory allocation error for field access node\n");
+        return NULL;
+    }
+    
+    node->type = NODE_FIELD_ACCESS;
+    node->line_number = line_number;
+    node->data.field_access.object = object;
+    node->data.field_access.field_name = strdup(field_name);
+    
+    return node;
+}
+
+/**
+ * Create an if node
+ */
+ASTNode* create_if_node(ASTNode* condition, ASTNode* then_branch, ASTNode* else_branch, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
+    if (!node) {
+        fprintf(stderr, "Memory allocation error for if node\n");
+        return NULL;
+    }
+    
+    node->type = NODE_IF;
+    node->line_number = line_number;
+    node->data.if_stmt.condition = condition;
+    node->data.if_stmt.then_branch = then_branch;
+    node->data.if_stmt.else_branch = else_branch;
+    
+    return node;
+}
+
+/**
+ * Create a while node
+ */
+ASTNode* create_while_node(ASTNode* condition, ASTNode* body, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
+    if (!node) {
+        fprintf(stderr, "Memory allocation error for while node\n");
+        return NULL;
+    }
+    
+    node->type = NODE_WHILE;
+    node->line_number = line_number;
+    node->data.while_stmt.condition = condition;
+    node->data.while_stmt.body = body;
+    
+    return node;
+}
+
+/**
+ * Create a for node
+ */
+ASTNode* create_for_node(ASTNode* init, ASTNode* condition, ASTNode* update, ASTNode* body, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
+    if (!node) {
+        fprintf(stderr, "Memory allocation error for for node\n");
+        return NULL;
+    }
+    
+    node->type = NODE_FOR;
+    node->line_number = line_number;
+    node->data.for_stmt.init = init;
+    node->data.for_stmt.condition = condition;
+    node->data.for_stmt.update = update;
+    node->data.for_stmt.body = body;
+    
+    return node;
+}
+
+/**
+ * Create a return node
+ */
+ASTNode* create_return_node(ASTNode* value, int line_number) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
+    if (!node) {
+        fprintf(stderr, "Memory allocation error for return node\n");
+        return NULL;
+    }
+    
+    node->type = NODE_RETURN;
+    node->line_number = line_number;
+    node->data.return_stmt.value = value;
     
     return node;
 }
@@ -515,115 +643,96 @@ ASTNode* create_jadwal_declaration_node(char *name, Field *fields, int line) {
 /**
  * Free an AST node and all its children
  */
-void free_ast_node(ASTNode *node) {
+void free_ast_node(ASTNode* node) {
     if (!node) return;
     
     switch (node->type) {
-        case NODE_PROGRAM:
-            if (node->data.program.declarations) {
-                for (int i = 0; i < node->data.program.declaration_count; i++) {
-                    free_ast_node(node->data.program.declarations[i]);
-                }
-                free(node->data.program.declarations);
-            }
-            if (node->data.program.main_function) {
-                free_ast_node(node->data.program.main_function);
-            }
-            break;
-            
-        case NODE_VAR_DECLARATION:
-            if (node->data.var_decl.name) free(node->data.var_decl.name);
-            if (node->data.var_decl.init_expr) free_ast_node(node->data.var_decl.init_expr);
-            break;
-            
-        case NODE_LIST_DECLARATION:
-            if (node->data.list_decl.name) free(node->data.list_decl.name);
-            if (node->data.list_decl.elements) {
-                for (int i = 0; i < node->data.list_decl.num_elements; i++) {
-                    free_ast_node(node->data.list_decl.elements[i]);
-                }
-                free(node->data.list_decl.elements);
-            }
-            break;
-            
-        case NODE_JADWAL_DECLARATION:
-            if (node->data.jadwal_decl.name) free(node->data.jadwal_decl.name);
-            if (node->data.jadwal_decl.fields) free_fields(node->data.jadwal_decl.fields);
-            break;
-            
-        case NODE_FUNC_DECLARATION:
-            if (node->data.func_decl.name) free(node->data.func_decl.name);
-            if (node->data.func_decl.parameters) free_parameters(node->data.func_decl.parameters);
-            if (node->data.func_decl.body) free_ast_node(node->data.func_decl.body);
-            break;
-            
-        case NODE_BINARY_OP:
-            if (node->data.binary_op.left) free_ast_node(node->data.binary_op.left);
-            if (node->data.binary_op.right) free_ast_node(node->data.binary_op.right);
-            break;
-            
-        case NODE_UNARY_OP:
-            if (node->data.unary_op.operand) free_ast_node(node->data.unary_op.operand);
-            break;
-            
         case NODE_STRING:
             if (node->data.string_value) free(node->data.string_value);
             break;
             
         case NODE_IDENTIFIER:
-            if (node->data.identifier.name) free(node->data.identifier.name);
+            if (node->data.identifier) free(node->data.identifier);
             break;
             
-        case NODE_ASSIGN:
-            if (node->data.assign.target) free_ast_node(node->data.assign.target);
-            if (node->data.assign.value) free_ast_node(node->data.assign.value);
+        case NODE_BINARY_OP:
+            free_ast_node(node->data.binary_op.left);
+            free_ast_node(node->data.binary_op.right);
             break;
             
-        case NODE_ARRAY_ACCESS:
-            if (node->data.array_access.array) free_ast_node(node->data.array_access.array);
-            if (node->data.array_access.index) free_ast_node(node->data.array_access.index);
+        case NODE_UNARY_OP:
+            free_ast_node(node->data.unary_op.operand);
             break;
             
-        case NODE_FIELD_ACCESS:
-            if (node->data.field_access.record) free_ast_node(node->data.field_access.record);
-            if (node->data.field_access.field_name) free(node->data.field_access.field_name);
+        case NODE_VAR_DECLARATION:
+            if (node->data.var_decl.name) free(node->data.var_decl.name);
+            if (node->data.var_decl.initializer) free_ast_node(node->data.var_decl.initializer);
+            break;
+            
+        case NODE_ASSIGNMENT:
+            free_ast_node(node->data.assignment.target);
+            free_ast_node(node->data.assignment.value);
             break;
             
         case NODE_IF:
-            if (node->data.if_stmt.condition) free_ast_node(node->data.if_stmt.condition);
-            if (node->data.if_stmt.if_body) free_ast_node(node->data.if_stmt.if_body);
-            if (node->data.if_stmt.else_body) free_ast_node(node->data.if_stmt.else_body);
+            free_ast_node(node->data.if_stmt.condition);
+            free_ast_node(node->data.if_stmt.then_branch);
+            if (node->data.if_stmt.else_branch) free_ast_node(node->data.if_stmt.else_branch);
             break;
             
         case NODE_WHILE:
+            free_ast_node(node->data.while_stmt.condition);
+            free_ast_node(node->data.while_stmt.body);
+            break;
+            
         case NODE_FOR:
-            if (node->data.loop.init) free_ast_node(node->data.loop.init);
-            if (node->data.loop.condition) free_ast_node(node->data.loop.condition);
-            if (node->data.loop.update) free_ast_node(node->data.loop.update);
-            if (node->data.loop.body) free_ast_node(node->data.loop.body);
-            break;
-            
-        case NODE_BLOCK:
-            if (node->data.block.statements) {
-                for (int i = 0; i < node->data.block.statement_count; i++) {
-                    free_ast_node(node->data.block.statements[i]);
-                }
-                free(node->data.block.statements);
-            }
-            break;
-            
-        case NODE_FUNC_CALL:
-            if (node->data.func_call.func_name) free(node->data.func_call.func_name);
-            if (node->data.func_call.args) {
-                for (int i = 0; i < node->data.func_call.arg_count; i++) {
-                    free_ast_node(node->data.func_call.args[i]);
-                }
-                free(node->data.func_call.args);
-            }
+            free_ast_node(node->data.for_stmt.init);
+            free_ast_node(node->data.for_stmt.condition);
+            free_ast_node(node->data.for_stmt.update);
+            free_ast_node(node->data.for_stmt.body);
             break;
             
         case NODE_RETURN:
-            if (node->data.return_stmt.expr) free_ast_node(node->data.return_stmt.expr);
+            free_ast_node(node->data.return_stmt.value);
+            break;
+            
+        case NODE_FUNCTION_CALL:
+            if (node->data.func_call.name) free(node->data.func_call.name);
+            if (node->data.func_call.arguments) {
+                for (int i = 0; i < node->data.func_call.arg_count; i++) {
+                    free_ast_node(node->data.func_call.arguments[i]);
+                }
+                free(node->data.func_call.arguments);
+            }
+            break;
+            
+        case NODE_FUNCTION_DECLARATION:
+            if (node->data.func_decl.name) free(node->data.func_decl.name);
+            if (node->data.func_decl.parameters) {
+                Parameter* param = node->data.func_decl.parameters;
+                while (param) {
+                    Parameter* next = param->next;
+                    if (param->name) free(param->name);
+                    free(param);
+                    param = next;
+                }
+            }
+            if (node->data.func_decl.body) free_ast_node(node->data.func_decl.body);
+            break;
+            
+        case NODE_SEQUENCE:
+            free_ast_node(node->data.sequence.first);
+            free_ast_node(node->data.sequence.second);
+            break;
+            
+        case NODE_ARRAY_ACCESS:
+            free_ast_node(node->data.array_access.array);
+            free_ast_node(node->data.array_access.index);
+            break;
+            
+        case NODE_FIELD_ACCESS:
+            free_ast_node(node->data.field_access.object);
+            if (node->data.field_access.field_name) free(node->data.field_access.field_name);
             break;
             
         default:
@@ -699,12 +808,8 @@ static void print_indent(int indent) {
 /**
  * Print the AST for debugging
  */
-void print_ast(ASTNode *node, int indent) {
-    if (!node) {
-        print_indent(indent);
-        printf("NULL\n");
-        return;
-    }
+void print_ast(ASTNode* node, int indent) {
+    if (!node) return;
     
     print_indent(indent);
     
@@ -712,34 +817,57 @@ void print_ast(ASTNode *node, int indent) {
         case NODE_PROGRAM:
             printf("Program (line %d)\n", node->line_number);
             print_indent(indent + 1);
-            printf("Declarations (%d):\n", node->data.program.declaration_count);
-            for (int i = 0; i < node->data.program.declaration_count; i++) {
+            printf("Declarations (%d):\n", node->data.program.decl_count);
+            for (int i = 0; i < node->data.program.decl_count; i++) {
                 print_ast(node->data.program.declarations[i], indent + 2);
             }
             print_indent(indent + 1);
-            printf("Main Function:\n");
-            if (node->data.program.main_function) {
-                print_ast(node->data.program.main_function, indent + 2);
+            printf("Main Block:\n");
+            if (node->data.program.main_block) {
+                print_ast(node->data.program.main_block, indent + 2);
             } else {
                 print_indent(indent + 2);
-                printf("NULL\n");
+                printf("(empty)\n");
             }
             break;
             
         case NODE_VAR_DECLARATION:
             printf("Variable Declaration: %s (type: %s, line %d)\n", 
                    node->data.var_decl.name, 
-                   symbol_type_to_string(node->data.var_decl.var_type),
+                   symbol_type_to_string(node->data.var_decl.type),
                    node->line_number);
-            if (node->data.var_decl.init_expr) {
+            if (node->data.var_decl.initializer) {
                 print_indent(indent + 1);
                 printf("Initial Value:\n");
-                print_ast(node->data.var_decl.init_expr, indent + 2);
+                print_ast(node->data.var_decl.initializer, indent + 2);
+            }
+            break;
+            
+        case NODE_FUNCTION_DECLARATION:
+            printf("Function Declaration: %s (return type: %s, line %d)\n",
+                   node->data.func_decl.name,
+                   symbol_type_to_string(node->data.func_decl.return_type),
+                   node->line_number);
+            if (node->data.func_decl.parameters) {
+                print_indent(indent + 1);
+                printf("Parameters:\n");
+                Parameter* param = node->data.func_decl.parameters;
+                while (param) {
+                    print_indent(indent + 2);
+                    printf("%s: %s\n", param->name, symbol_type_to_string(param->type));
+                    param = param->next;
+                }
+            }
+            if (node->data.func_decl.body) {
+                print_indent(indent + 1);
+                printf("Body:\n");
+                print_ast(node->data.func_decl.body, indent + 2);
             }
             break;
             
         case NODE_BINARY_OP:
-            printf("Binary Operation (line %d): ", node->line_number);
+            printf("Binary Operation (line %d):\n", node->line_number);
+            print_indent(indent + 1);
             switch (node->data.binary_op.op) {
                 case OP_ADD:    printf("ADD (+)\n"); break;
                 case OP_SUB:    printf("SUBTRACT (-)\n"); break;
@@ -752,25 +880,40 @@ void print_ast(ASTNode *node, int indent) {
                 case OP_NEQ:    printf("NOT EQUAL (<>)\n"); break;
                 case OP_LT:     printf("LESS THAN (<)\n"); break;
                 case OP_GT:     printf("GREATER THAN (>)\n"); break;
-                case OP_LE:     printf("LESS EQUAL (<=)\n"); break;
-                case OP_GE:     printf("GREATER EQUAL (>=)\n"); break;
-                default:        printf("UNKNOWN\n"); break;
+                case OP_LTE:    printf("LESS EQUAL (<=)\n"); break;
+                case OP_GTE:    printf("GREATER EQUAL (>=)\n"); break;
+                case OP_FACT:   printf("FACTORIAL (!)\n"); break;
+                case OP_NOT:    printf("NOT (machi)\n"); break;
+                default:        printf("UNKNOWN OPERATOR\n"); break;
             }
             print_indent(indent + 1);
-            printf("Left Operand:\n");
+            printf("Left:\n");
             print_ast(node->data.binary_op.left, indent + 2);
             print_indent(indent + 1);
-            printf("Right Operand:\n");
+            printf("Right:\n");
             print_ast(node->data.binary_op.right, indent + 2);
             break;
             
         case NODE_UNARY_OP:
-            printf("Unary Operation (line %d): ", node->line_number);
+            printf("Unary Operation (line %d):\n", node->line_number);
+            print_indent(indent + 1);
             switch (node->data.unary_op.op) {
-                case OP_NEG:  printf("NEGATE (-)\n"); break;
-                case OP_NOT:  printf("NOT (machi)\n"); break;
-                case OP_FACT: printf("FACTORIAL (!)\n"); break;
-                default:      printf("UNKNOWN\n"); break;
+                case OP_NOT:    printf("NOT (machi)\n"); break;
+                case OP_FACT:   printf("FACTORIAL (!)\n"); break;
+                case OP_ADD:    printf("UNARY PLUS (+)\n"); break;
+                case OP_SUB:    printf("UNARY MINUS (-)\n"); break;
+                case OP_MUL:    printf("UNARY MULTIPLY (*)\n"); break;
+                case OP_DIV:    printf("UNARY DIVIDE (/)\n"); break;
+                case OP_INT_DIV: printf("UNARY INTEGER DIVIDE (div)\n"); break;
+                case OP_AND:    printf("UNARY AND (w)\n"); break;
+                case OP_OR:     printf("UNARY OR (wla)\n"); break;
+                case OP_EQ:     printf("UNARY EQUAL (==)\n"); break;
+                case OP_NEQ:    printf("UNARY NOT EQUAL (<>)\n"); break;
+                case OP_LT:     printf("UNARY LESS THAN (<)\n"); break;
+                case OP_GT:     printf("UNARY GREATER THAN (>)\n"); break;
+                case OP_LTE:    printf("UNARY LESS EQUAL (<=)\n"); break;
+                case OP_GTE:    printf("UNARY GREATER EQUAL (>=)\n"); break;
+                default:        printf("UNKNOWN UNARY OPERATOR\n"); break;
             }
             print_indent(indent + 1);
             printf("Operand:\n");
@@ -778,123 +921,538 @@ void print_ast(ASTNode *node, int indent) {
             break;
             
         case NODE_NUMBER:
-            printf("Number: %f (line %d)\n", node->data.number_value, node->line_number);
+            printf("Number: %g (line %d)\n", node->data.number_value, node->line_number);
             break;
             
         case NODE_STRING:
-            printf("String: %s (line %d)\n", node->data.string_value, node->line_number);
+            printf("String: \"%s\" (line %d)\n", node->data.string_value, node->line_number);
             break;
             
         case NODE_IDENTIFIER:
-            printf("Identifier: %s (line %d)\n", node->data.identifier.name, node->line_number);
+            printf("Identifier: %s (line %d)\n", node->data.identifier, node->line_number);
             break;
             
-        case NODE_JADWAL_DECLARATION:
-            printf("Jadwal Declaration: %s (line %d)\n", 
-                   node->data.jadwal_decl.name, node->line_number);
-            if (node->data.jadwal_decl.fields) {
+        case NODE_ASSIGNMENT:
+            printf("Assignment (line %d):\n", node->line_number);
+            print_indent(indent + 1);
+            printf("Target:\n");
+            print_ast(node->data.assignment.target, indent + 2);
+            print_indent(indent + 1);
+            printf("Value:\n");
+            print_ast(node->data.assignment.value, indent + 2);
+            break;
+            
+        case NODE_IF:
+            printf("If Statement (line %d):\n", node->line_number);
+            print_indent(indent + 1);
+            printf("Condition:\n");
+            print_ast(node->data.if_stmt.condition, indent + 2);
+            print_indent(indent + 1);
+            printf("Then Branch:\n");
+            print_ast(node->data.if_stmt.then_branch, indent + 2);
+            if (node->data.if_stmt.else_branch) {
                 print_indent(indent + 1);
-                printf("Fields:\n");
-                Field *field = node->data.jadwal_decl.fields;
-                while (field) {
-                    print_indent(indent + 2);
-                    printf("%s: %s\n", field->name, symbol_type_to_string(field->type));
-                    field = field->next;
+                printf("Else Branch:\n");
+                print_ast(node->data.if_stmt.else_branch, indent + 2);
+            }
+            break;
+            
+        case NODE_WHILE:
+            printf("While Loop (line %d):\n", node->line_number);
+            print_indent(indent + 1);
+            printf("Condition:\n");
+            print_ast(node->data.while_stmt.condition, indent + 2);
+            print_indent(indent + 1);
+            printf("Body:\n");
+            print_ast(node->data.while_stmt.body, indent + 2);
+            break;
+            
+        case NODE_FOR:
+            printf("For Loop (line %d):\n", node->line_number);
+            print_indent(indent + 1);
+            printf("Initialization:\n");
+            print_ast(node->data.for_stmt.init, indent + 2);
+            print_indent(indent + 1);
+            printf("Condition:\n");
+            print_ast(node->data.for_stmt.condition, indent + 2);
+            print_indent(indent + 1);
+            printf("Update:\n");
+            print_ast(node->data.for_stmt.update, indent + 2);
+            print_indent(indent + 1);
+            printf("Body:\n");
+            print_ast(node->data.for_stmt.body, indent + 2);
+            break;
+            
+        case NODE_RETURN:
+            printf("Return Statement (line %d):\n", node->line_number);
+            if (node->data.return_stmt.value) {
+                print_indent(indent + 1);
+                printf("Value:\n");
+                print_ast(node->data.return_stmt.value, indent + 2);
+            }
+            break;
+            
+        case NODE_FUNCTION_CALL:
+            printf("Function Call: %s (line %d)\n", node->data.func_call.name, node->line_number);
+            if (node->data.func_call.arguments) {
+                print_indent(indent + 1);
+                printf("Arguments:\n");
+                for (int i = 0; i < node->data.func_call.arg_count; i++) {
+                    print_ast(node->data.func_call.arguments[i], indent + 2);
                 }
             }
             break;
             
+        case NODE_SEQUENCE:
+            printf("Sequence (line %d):\n", node->line_number);
+            print_indent(indent + 1);
+            printf("First:\n");
+            print_ast(node->data.sequence.first, indent + 2);
+            print_indent(indent + 1);
+            printf("Second:\n");
+            print_ast(node->data.sequence.second, indent + 2);
+            break;
+            
+        case NODE_ARRAY_ACCESS:
+            printf("Array Access (line %d):\n", node->line_number);
+            print_indent(indent + 1);
+            printf("Array:\n");
+            print_ast(node->data.array_access.array, indent + 2);
+            print_indent(indent + 1);
+            printf("Index:\n");
+            print_ast(node->data.array_access.index, indent + 2);
+            break;
+            
+        case NODE_FIELD_ACCESS:
+            printf("Field Access (line %d):\n", node->line_number);
+            print_indent(indent + 1);
+            printf("Object:\n");
+            print_ast(node->data.field_access.object, indent + 2);
+            print_indent(indent + 1);
+            printf("Field: %s\n", node->data.field_access.field_name);
+            break;
+            
         default:
-            printf("Unknown node type: %d (line %d)\n", node->type, node->line_number);
+            printf("Unknown Node Type: %d (line %d)\n", node->type, node->line_number);
             break;
     }
 }
 
 /* ------------------- Semantic Analysis Functions ------------------- */
 
+/* Helper function to check type compatibility */
+static int is_type_compatible(SymbolType left_type, SymbolType right_type) {
+    if (left_type == right_type) return 1;
+    
+    // Special cases for type compatibility
+    if (left_type == TYPE_RA9M && right_type == TYPE_WA9ILA) return 1;
+    if (left_type == TYPE_WA9ILA && right_type == TYPE_RA9M) return 1;
+    
+    return 0;
+}
+
+/* Helper function to get expression type */
+static SymbolType get_expression_type(ASTNode* node, SymbolTable* table) {
+    if (!node) return TYPE_UNKNOWN;
+    
+    switch (node->type) {
+        case NODE_NUMBER:
+            return TYPE_RA9M;
+            
+        case NODE_STRING:
+            return TYPE_KTABA;
+            
+        case NODE_IDENTIFIER: {
+            SymbolEntry* entry = lookup_symbol(table, node->data.identifier);
+            return entry ? entry->type : TYPE_UNKNOWN;
+        }
+        
+        case NODE_BINARY_OP: {
+            SymbolType left_type = get_expression_type(node->data.binary_op.left, table);
+            SymbolType right_type = get_expression_type(node->data.binary_op.right, table);
+            
+            switch (node->data.binary_op.op) {
+                case OP_ADD:
+                case OP_SUB:
+                case OP_MUL:
+                case OP_DIV:
+                case OP_INT_DIV:
+                    if (left_type == TYPE_RA9M && right_type == TYPE_RA9M)
+                        return TYPE_RA9M;
+                    return TYPE_UNKNOWN;
+                    
+                case OP_AND:
+                case OP_OR:
+                    if (left_type == TYPE_WA9ILA && right_type == TYPE_WA9ILA)
+                        return TYPE_WA9ILA;
+                    return TYPE_UNKNOWN;
+                    
+                case OP_EQ:
+                case OP_NEQ:
+                case OP_GT:
+                case OP_LT:
+                case OP_GTE:
+                case OP_LTE:
+                    return TYPE_WA9ILA;
+                    
+                default:
+                    return TYPE_UNKNOWN;
+            }
+        }
+        
+        case NODE_UNARY_OP: {
+            SymbolType operand_type = get_expression_type(node->data.unary_op.operand, table);
+            
+            switch (node->data.unary_op.op) {
+                case OP_NOT:
+                    if (operand_type == TYPE_WA9ILA)
+                        return TYPE_WA9ILA;
+                    return TYPE_UNKNOWN;
+                    
+                case OP_FACT:
+                    if (operand_type == TYPE_RA9M)
+                        return TYPE_RA9M;
+                    return TYPE_UNKNOWN;
+                    
+                default:
+                    return TYPE_UNKNOWN;
+            }
+        }
+        
+        case NODE_FUNCTION_CALL: {
+            SymbolEntry* func = lookup_symbol(table, node->data.func_call.name);
+            if (func && func->category == SYMBOL_FUNCTION)
+                return func->value.func_info.return_type;
+            return TYPE_UNKNOWN;
+        }
+        
+        default:
+            return TYPE_UNKNOWN;
+    }
+}
+
 /**
  * Perform semantic analysis on the AST
  */
-void analyze_ast(ASTNode *node, SymbolTable *table) {
-    if (!node || !table) return;
+void analyze_ast(ASTNode* node, SymbolTable* table) {
+    if (!node) return;
     
     switch (node->type) {
         case NODE_PROGRAM:
             /* Enter global scope for program */
-            for (int i = 0; i < node->data.program.declaration_count; i++) {
+            for (int i = 0; i < node->data.program.decl_count; i++) {
                 analyze_ast(node->data.program.declarations[i], table);
             }
-            if (node->data.program.main_function) {
-                analyze_ast(node->data.program.main_function, table);
+            if (node->data.program.main_block) {
+                analyze_ast(node->data.program.main_block, table);
             }
             break;
             
-        case NODE_VAR_DECLARATION:
+        case NODE_VAR_DECLARATION: {
+            /* Check for duplicate declaration in current scope */
+            if (lookup_symbol_current_scope(table, node->data.var_decl.name)) {
+                fprintf(stderr, "Error at line %d: Variable '%s' already declared in current scope\n",
+                        node->line_number, node->data.var_decl.name);
+                break;
+            }
+            
             /* Add variable to symbol table */
             node->data.var_decl.symbol = add_symbol(
-                table, 
-                node->data.var_decl.name, 
-                node->data.var_decl.var_type, 
-                SYMBOL_VARIABLE, 
+                table,
+                node->data.var_decl.name,
+                node->data.var_decl.type,
+                SYMBOL_VARIABLE,
                 node->line_number
             );
             
-            /* Analyze initializer if present */
-            if (node->data.var_decl.init_expr) {
-                analyze_ast(node->data.var_decl.init_expr, table);
-                /* Type checking would happen here in a full implementation */
+            /* Check initializer type if present */
+            if (node->data.var_decl.initializer) {
+                analyze_ast(node->data.var_decl.initializer, table);
+                SymbolType init_type = get_expression_type(node->data.var_decl.initializer, table);
+                
+                if (!is_type_compatible(node->data.var_decl.type, init_type)) {
+                    fprintf(stderr, "Error at line %d: Type mismatch in initialization of '%s'\n",
+                            node->line_number, node->data.var_decl.name);
+                }
             }
             break;
+        }
             
-        case NODE_JADWAL_DECLARATION:
-            /* Add jadwal to symbol table */
-            node->data.jadwal_decl.symbol = add_symbol(
-                table, 
-                node->data.jadwal_decl.name, 
-                TYPE_JADWAL, 
-                SYMBOL_VARIABLE, 
+        case NODE_FUNCTION_DECLARATION: {
+            /* Check for duplicate function declaration */
+            if (lookup_symbol_current_scope(table, node->data.func_decl.name)) {
+                fprintf(stderr, "Error at line %d: Function '%s' already declared\n",
+                        node->line_number, node->data.func_decl.name);
+                break;
+            }
+            
+            /* Add function to symbol table */
+            node->data.func_decl.symbol = add_symbol(
+                table,
+                node->data.func_decl.name,
+                TYPE_FUNCTION,
+                SYMBOL_FUNCTION,
                 node->line_number
             );
             
-            /* Set fields for the jadwal type */
-            if (node->data.jadwal_decl.symbol) {
-                /* We need to duplicate the fields to avoid double-free issues */
-                Field *orig_field = node->data.jadwal_decl.fields;
-                Field *prev_field = NULL;
-                Field *first_field = NULL;
+            if (node->data.func_decl.symbol) {
+                node->data.func_decl.symbol->value.func_info.return_type = node->data.func_decl.return_type;
+                node->data.func_decl.symbol->value.func_info.parameters = node->data.func_decl.parameters;
                 
-                while (orig_field) {
-                    Field *new_field = create_field(orig_field->name, orig_field->type);
-                    
-                    if (!first_field) {
-                        first_field = new_field;
-                    }
-                    
-                    if (prev_field) {
-                        prev_field->next = new_field;
-                    }
-                    
-                    prev_field = new_field;
-                    orig_field = orig_field->next;
+                /* Enter new scope for function body */
+                enter_scope(table);
+                
+                /* Add parameters to symbol table */
+                Parameter* param = node->data.func_decl.parameters;
+                while (param) {
+                    add_symbol(table, param->name, param->type, SYMBOL_PARAMETER, node->line_number);
+                    param = param->next;
                 }
                 
-                node->data.jadwal_decl.symbol->value.fields = first_field;
+                /* Analyze function body */
+                if (node->data.func_decl.body) {
+                    analyze_ast(node->data.func_decl.body, table);
+                }
+                
+                /* Exit function scope */
+                exit_scope(table);
+            }
+            break;
+        }
+            
+        case NODE_BINARY_OP: {
+            analyze_ast(node->data.binary_op.left, table);
+            analyze_ast(node->data.binary_op.right, table);
+            
+            SymbolType left_type = get_expression_type(node->data.binary_op.left, table);
+            SymbolType right_type = get_expression_type(node->data.binary_op.right, table);
+            
+            /* Type checking for operators */
+            switch (node->data.binary_op.op) {
+                case OP_ADD:
+                case OP_SUB:
+                case OP_MUL:
+                case OP_DIV:
+                case OP_INT_DIV:
+                    if (left_type != TYPE_RA9M || right_type != TYPE_RA9M) {
+                        fprintf(stderr, "Error at line %d: Arithmetic operation requires numeric operands\n",
+                                node->line_number);
+                    }
+                    break;
+                    
+                case OP_AND:
+                case OP_OR:
+                    if (left_type != TYPE_WA9ILA || right_type != TYPE_WA9ILA) {
+                        fprintf(stderr, "Error at line %d: Logical operation requires boolean operands\n",
+                                node->line_number);
+                    }
+                    break;
+                    
+                default:
+                    break;
+            }
+            break;
+        }
+            
+        case NODE_UNARY_OP:
+            analyze_ast(node->data.unary_op.operand, table);
+            
+            if (node->data.unary_op.op == OP_NOT) {
+                SymbolType operand_type = get_expression_type(node->data.unary_op.operand, table);
+                if (operand_type != TYPE_WA9ILA) {
+                    fprintf(stderr, "Error at line %d: Logical NOT operation requires boolean operand\n",
+                            node->line_number);
+                }
             }
             break;
             
-        case NODE_IDENTIFIER:
-            /* Look up identifier in symbol table */
-            node->data.identifier.symbol = lookup_symbol(table, node->data.identifier.name);
-            if (!node->data.identifier.symbol) {
-                fprintf(stderr, "Error: Undefined identifier '%s' at line %d\n", 
-                        node->data.identifier.name, node->line_number);
+        case NODE_IDENTIFIER: {
+            /* Check if identifier is declared */
+            SymbolEntry* entry = lookup_symbol(table, node->data.identifier);
+            if (!entry) {
+                fprintf(stderr, "Error at line %d: Undefined identifier '%s'\n",
+                        node->line_number, node->data.identifier);
+            }
+            break;
+        }
+            
+        case NODE_ASSIGNMENT: {
+            analyze_ast(node->data.assignment.target, table);
+            analyze_ast(node->data.assignment.value, table);
+            
+            SymbolType target_type = get_expression_type(node->data.assignment.target, table);
+            SymbolType value_type = get_expression_type(node->data.assignment.value, table);
+            
+            if (!is_type_compatible(target_type, value_type)) {
+                fprintf(stderr, "Error at line %d: Type mismatch in assignment\n",
+                        node->line_number);
+            }
+            break;
+        }
+            
+        case NODE_IF:
+            analyze_ast(node->data.if_stmt.condition, table);
+            
+            SymbolType cond_type = get_expression_type(node->data.if_stmt.condition, table);
+            if (cond_type != TYPE_WA9ILA) {
+                fprintf(stderr, "Error at line %d: Condition must be of boolean type\n",
+                        node->line_number);
+            }
+            
+            enter_scope(table);
+            analyze_ast(node->data.if_stmt.then_branch, table);
+            exit_scope(table);
+            
+            if (node->data.if_stmt.else_branch) {
+                enter_scope(table);
+                analyze_ast(node->data.if_stmt.else_branch, table);
+                exit_scope(table);
             }
             break;
             
-        /* Additional case handlers would be implemented for a full compiler */
+        case NODE_WHILE:
+            analyze_ast(node->data.while_stmt.condition, table);
+            
+            SymbolType while_cond_type = get_expression_type(node->data.while_stmt.condition, table);
+            if (while_cond_type != TYPE_WA9ILA) {
+                fprintf(stderr, "Error at line %d: Loop condition must be of boolean type\n",
+                        node->line_number);
+            }
+            
+            enter_scope(table);
+            analyze_ast(node->data.while_stmt.body, table);
+            exit_scope(table);
+            break;
+            
+        case NODE_FOR:
+            enter_scope(table);
+            
+            analyze_ast(node->data.for_stmt.init, table);
+            analyze_ast(node->data.for_stmt.condition, table);
+            analyze_ast(node->data.for_stmt.update, table);
+            
+            SymbolType for_cond_type = get_expression_type(node->data.for_stmt.condition, table);
+            if (for_cond_type != TYPE_WA9ILA) {
+                fprintf(stderr, "Error at line %d: For loop condition must be of boolean type\n",
+                        node->line_number);
+            }
+            
+            analyze_ast(node->data.for_stmt.body, table);
+            exit_scope(table);
+            break;
+            
+        case NODE_RETURN: {
+            if (node->data.return_stmt.value) {
+                analyze_ast(node->data.return_stmt.value, table);
+                
+                /* Find enclosing function's return type */
+                Scope* scope = table->current_scope;
+                SymbolType expected_type = TYPE_UNKNOWN;
+                
+                while (scope) {
+                    SymbolEntry* entry = scope->entries;
+                    while (entry) {
+                        if (entry->category == SYMBOL_FUNCTION) {
+                            expected_type = entry->value.func_info.return_type;
+                            goto found_return_type;
+                        }
+                        entry = entry->next;
+                    }
+                    scope = scope->parent;
+                }
+                
+            found_return_type:
+                {
+                    SymbolType actual_type = get_expression_type(node->data.return_stmt.value, table);
+                    if (!is_type_compatible(expected_type, actual_type)) {
+                        fprintf(stderr, "Error at line %d: Return type mismatch\n",
+                                node->line_number);
+                    }
+                }
+            }
+            break;
+        }
+            
+        case NODE_FUNCTION_CALL: {
+            /* Check if function exists */
+            SymbolEntry* func = lookup_symbol(table, node->data.func_call.name);
+            if (!func) {
+                fprintf(stderr, "Error at line %d: Undefined function '%s'\n",
+                        node->line_number, node->data.func_call.name);
+                break;
+            }
+            
+            if (func->category != SYMBOL_FUNCTION) {
+                fprintf(stderr, "Error at line %d: '%s' is not a function\n",
+                        node->line_number, node->data.func_call.name);
+                break;
+            }
+            
+            node->data.func_call.symbol = func;
+            
+            /* Check argument types */
+            Parameter* param = func->value.func_info.parameters;
+            int arg_index = 0;
+            
+            while (param && arg_index < node->data.func_call.arg_count) {
+                analyze_ast(node->data.func_call.arguments[arg_index], table);
+                
+                SymbolType arg_type = get_expression_type(node->data.func_call.arguments[arg_index], table);
+                if (!is_type_compatible(param->type, arg_type)) {
+                    fprintf(stderr, "Error at line %d: Type mismatch in argument %d of call to '%s'\n",
+                            node->line_number, arg_index + 1, node->data.func_call.name);
+                }
+                
+                param = param->next;
+                arg_index++;
+            }
+            
+            if (param) {
+                fprintf(stderr, "Error at line %d: Too few arguments in call to '%s'\n",
+                        node->line_number, node->data.func_call.name);
+            }
+            
+            if (arg_index < node->data.func_call.arg_count) {
+                fprintf(stderr, "Error at line %d: Too many arguments in call to '%s'\n",
+                        node->line_number, node->data.func_call.name);
+            }
+            break;
+        }
+            
+        case NODE_SEQUENCE:
+            analyze_ast(node->data.sequence.first, table);
+            analyze_ast(node->data.sequence.second, table);
+            break;
+            
+        case NODE_ARRAY_ACCESS:
+            analyze_ast(node->data.array_access.array, table);
+            analyze_ast(node->data.array_access.index, table);
+            
+            SymbolType array_type = get_expression_type(node->data.array_access.array, table);
+            SymbolType index_type = get_expression_type(node->data.array_access.index, table);
+            
+            if (array_type != TYPE_LISTA) {
+                fprintf(stderr, "Error at line %d: Array access on non-array type\n",
+                        node->line_number);
+            }
+            
+            if (index_type != TYPE_RA9M) {
+                fprintf(stderr, "Error at line %d: Array index must be numeric\n",
+                        node->line_number);
+            }
+            break;
+            
+        case NODE_FIELD_ACCESS:
+            analyze_ast(node->data.field_access.object, table);
+            
+            SymbolType object_type = get_expression_type(node->data.field_access.object, table);
+            if (object_type != TYPE_JADWAL) {
+                fprintf(stderr, "Error at line %d: Field access on non-jadwal type\n",
+                        node->line_number);
+            }
+            break;
             
         default:
-            /* Handle other node types as needed */
             break;
     }
-} 
+}

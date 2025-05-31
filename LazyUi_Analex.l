@@ -5,78 +5,64 @@
 #include "LazyUi_Parser.tab.h"
 
 extern int yylineno;
+// extern YYSTYPE yylval; // Désactivé pour test lexical pur
+
+#define MAX_STRING_LEN 1024
+char string_buf[MAX_STRING_LEN];
+char *string_buf_ptr;
+
+static void debug_print(const char* msg) {
+    fprintf(stderr, "DEBUG: %s\n", msg);
+}
+
+static void lexer_error(const char* msg) {
+    fprintf(stderr, "Error at line %d: %s\n", yylineno, msg);
+}
 %}
 
 %option noyywrap
-%option case-insensitive
+
+%x STRING
+%x COMMENT_LINE
+%x COMMENT_BLOCK
 
 %%
 
-"w"             { return TK_ET; }
-"wla"           { return TK_OU; }
-"machi"         { return TK_NON; }
-"+"             { return TK_ADD; }
-"-"             { return TK_SUB; }
-"*"             { return TK_MUL; }
-"/"             { return TK_DIV; }
-"!"             { return TK_FACT; }
-"div"           { return TK_INT_DIV; }
-">"             { return TK_SUP; }
-">="            { return TK_SUP_EQ; }
-"<"             { return TK_INF; }
-"<="            { return TK_INF_EQ; }
-"<>"            { return TK_DIFF; }
-"=="            { return TK_EQUAL; }
-":="            { return TK_AFFECTATION; }
-"wa9ila"        { return TK_WA9ILA; }
-"hitach"        { return TK_HITACH; }
-"fi_halat"      { return TK_FI_HALAT; }
-"ktaba"         { return TK_KTABA; }
-"kml_htal"      { return TK_KML_HTAL; }
-"kteb"          { return TK_KTEB; }
-"ila"           { return TK_ILA; }
-"ilamakanch"    { return TK_ILAMAKANCH; }
-"dir"           { return TK_DIR; }
-"ra9m"          { return TK_RA9M; }
-"dakhal"        { return TK_DAKHAL; }
-"mn"            { return TK_MN; }
-"l"             { return TK_L; }
-"b"             { return TK_B; }
-"ma7ed"         { return TK_MA7ED; }
-"htal"          { return TK_HTAL; }
-"wlala"         { return TK_WLALA; }
-"tawzi3"        { return TK_TAWZI3; }
-"Jadwal"        { return TK_JADWAL; }
-"rja3"          { return TK_RJE3; }
-"jarrab"        { return TK_JARRAB; }
-"l_kol"         { return TK_L_KOL; }
-"fi"            { return TK_FI; }
-"wilakan"       { return TK_WILAKAN; }
-"lista"         { return TK_LISTA; }
-"taarif"        { return TK_TAARIF; }
-"zid"           { return TK_ZID; }
-"msah"          { return TK_MSAH; }
-"main"          { return TK_MAIN; }
+"taarif"        { debug_print("Found TK_TAARIF"); return TK_TAARIF; }
+"ra9m"          { debug_print("Found TK_RA9M"); return TK_RA9M; }
+"rje3"          { debug_print("Found TK_RJE3"); return TK_RJE3; }
+"kteb"          { debug_print("Found TK_KTEB"); return TK_KTEB; }
 
-[ \t\n]+       ;  /* Ignorer les espaces et nouvelles lignes */
+"+"             { debug_print("Found TK_ADD"); return TK_ADD; }
+"-"             { debug_print("Found TK_SUB"); return TK_SUB; }
+"*"             { debug_print("Found TK_MUL"); return TK_MUL; }
+"/"             { debug_print("Found TK_DIV"); return TK_DIV; }
 
-[a-zA-Z_][a-zA-Z0-9_]*   { yylval.string = strdup(yytext); return TK_IDENTIFIANT; }
-[0-9]+(\.[0-9]+)?   { yylval.number = atof(yytext); return TK_NUMBER; }
-\"[^\"]*\"   { yylval.string = strdup(yytext); return TK_STRING; }
-"--".*       ;  /* Commentaire de fin de ligne */
-"/--".*"--/" ;  /* Commentaire multi-lignes */
+":="            { debug_print("Found TK_AFFECTATION"); return TK_AFFECTATION; }
+"="             { debug_print("Found TK_AFFECTATION"); return TK_AFFECTATION; }
 
-":"    { return TK_COLON; }
-"{"    { return TK_LBRACE; }
-"}"    { return TK_RBRACE; }
-"("    { return TK_LPAREN; }
-")"    { return TK_RPAREN; }
-","    { return TK_COMMA; }
-";"    { return TK_SEMICOLON; }
-"["    { return TK_LBRACKET; }
-"]"    { return TK_RBRACKET; }
-"."    { return TK_DOT; }
+[ \t\r\n]+      { /* Ignore whitespace */ }
 
-.       { printf("SYMBOLE NON RECONNU: %s\n", yytext); }
+[a-zA-Z_][a-zA-Z0-9_]*   { 
+    debug_print("Found identifier");
+    yylval.string = strdup(yytext);
+    return TK_IDENTIFIANT; 
+}
+
+[0-9]+(\.[0-9]+)?   { 
+    debug_print("Found number");
+    yylval.number = atof(yytext);
+    return TK_NUMBER; 
+}
+
+":"             { debug_print("Found TK_COLON"); return TK_COLON; }
+"{"             { debug_print("Found TK_LBRACE"); return TK_LBRACE; }
+"}"             { debug_print("Found TK_RBRACE"); return TK_RBRACE; }
+"("             { debug_print("Found TK_LPAREN"); return TK_LPAREN; }
+")"             { debug_print("Found TK_RPAREN"); return TK_RPAREN; }
+","             { debug_print("Found TK_COMMA"); return TK_COMMA; }
+";"             { debug_print("Found TK_SEMICOLON"); return TK_SEMICOLON; }
+
+.               { printf("UNRECOGNIZED: %s (ASCII: %d)\n", yytext, yytext[0]); }
 
 %%

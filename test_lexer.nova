@@ -1,0 +1,56 @@
+-- Test des mots-clés
+taarif ra9m x = 10;
+taarif ktaba message = "Hello NOVA!";
+taarif wa9ila is_valid := true;
+
+-- Test des opérateurs
+taarif ra9m sum := 10 + 5;
+taarif ra9m diff := 20 - 8;
+taarif ra9m product := 6 * 7;
+taarif ra9m quotient := 100 div 4;
+
+-- Test des chaînes avec échappement
+taarif ktaba path := "C:\\Users\\test\\file.txt";
+taarif ktaba text := "Line 1\nLine 2\tTabbed";
+
+-- Test des commentaires
+/* Ceci est un commentaire
+   sur plusieurs lignes */
+-- Ceci est un commentaire sur une ligne
+
+-- Test des structures de contrôle
+ila (x > 0) {
+    kteb("x est positif");
+} ilamakanch {
+    kteb("x est négatif");
+}
+
+-- Test des boucles
+taarif ra9m i := 1;
+htal (i <= 5) {
+    kteb(i);
+    i := i + 1;
+}
+
+-- Test des listes
+taarif lista ra9m numbers := [1, 2, 3, 4, 5];
+zid(numbers, 6);
+msah(numbers, 0);
+
+-- Test des fonctions
+taarif ra9m calculate(ra9m a, ra9m b) {
+    rje3 a + b;
+}
+
+-- Test des Jadwal
+taarif jadwal Person {
+    ra9m age;
+    ktaba name;
+    wa9ila is_active;
+}
+
+-- Test des opérations sur les Jadwal
+taarif Person p1;
+p1.age := 25;
+p1.name := "John";
+p1.is_active := true; 

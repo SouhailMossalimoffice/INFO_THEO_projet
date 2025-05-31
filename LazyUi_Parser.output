@@ -1,0 +1,2006 @@
+Terminals which are not used
+
+   TK_COLON
+   TK_ILAMAKANCH
+   TK_MA7ED
+   TK_TAWZI3
+   TK_W
+   TK_WLA
+   TK_MACHI
+   TK_HITACH
+   TK_FI_HALAT
+   TK_KML_HTAL
+   TK_FI
+   TK_JARRAB
+   TK_L_KOL
+   TK_ZID
+   TK_MSAH
+   TK_WLALA
+
+
+Grammar
+
+    0 $accept: programme $end
+
+    1 programme: declarations_variables declarations_fonctions programme_principal
+    2          | declarations_fonctions programme_principal
+    3          | programme_principal
+
+    4 declarations_variables: declaration_variable
+    5                       | declarations_variables declaration_variable
+
+    6 declaration_variable: TK_TAARIF type TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON
+    7                     | TK_TAARIF type TK_IDENTIFIANT TK_SEMICOLON
+
+    8 type: TK_RA9M
+    9     | TK_KTABA
+   10     | TK_WA9ILA
+   11     | TK_LISTA
+   12     | TK_JADWAL
+
+   13 declarations_fonctions: declaration_fonction
+   14                       | declarations_fonctions declaration_fonction
+
+   15 declaration_fonction: TK_TAARIF type TK_IDENTIFIANT TK_LPAREN parametres TK_RPAREN TK_LBRACE bloc TK_RBRACE
+   16                     | TK_TAARIF type TK_IDENTIFIANT TK_LPAREN TK_RPAREN TK_LBRACE bloc TK_RBRACE
+
+   17 parametres: parametre
+   18           | parametres TK_COMMA parametre
+
+   19 parametre: type TK_IDENTIFIANT
+
+   20 bloc: TK_LBRACE instructions TK_RBRACE
+   21     | TK_LBRACE TK_RBRACE
+
+   22 instructions: instruction
+   23             | instructions instruction
+
+   24 instruction: affectation
+   25            | instruction_condition
+   26            | instruction_boucle
+   27            | instruction_retour
+   28            | instruction_io
+   29            | declaration_variable
+   30            | appel_fonction_expr TK_SEMICOLON
+
+   31 affectation: TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON
+   32            | acces_element TK_AFFECTATION expression TK_SEMICOLON
+
+   33 instruction_retour: TK_RJE3 expression TK_SEMICOLON
+
+   34 programme_principal: TK_MAIN bloc
+
+   35 expression: expression_logique
+
+   36 expression_logique: expression_comparison
+   37                   | expression_logique TK_ET expression_comparison
+   38                   | expression_logique TK_OU expression_comparison
+   39                   | TK_NON expression_comparison
+
+   40 expression_comparison: expression_arithmetique
+   41                      | expression_arithmetique TK_EQUAL expression_arithmetique
+   42                      | expression_arithmetique TK_DIFF expression_arithmetique
+   43                      | expression_arithmetique TK_SUP expression_arithmetique
+   44                      | expression_arithmetique TK_INF expression_arithmetique
+   45                      | expression_arithmetique TK_SUP_EQ expression_arithmetique
+   46                      | expression_arithmetique TK_INF_EQ expression_arithmetique
+
+   47 expression_arithmetique: terme
+   48                        | expression_arithmetique TK_ADD terme
+   49                        | expression_arithmetique TK_SUB terme
+
+   50 terme: facteur
+   51      | terme TK_MUL facteur
+   52      | terme TK_DIV facteur
+   53      | terme TK_INT_DIV facteur
+
+   54 facteur: valeur
+   55        | TK_LPAREN expression TK_RPAREN
+   56        | TK_FACT facteur
+   57        | appel_fonction_expr
+
+   58 valeur: TK_NUMBER
+   59       | TK_STRING
+   60       | TK_IDENTIFIANT
+
+   61 acces_element: TK_IDENTIFIANT TK_DOT TK_IDENTIFIANT
+   62              | TK_IDENTIFIANT TK_LBRACKET expression TK_RBRACKET
+
+   63 appel_fonction_expr: TK_IDENTIFIANT TK_LPAREN arguments TK_RPAREN
+   64                    | TK_IDENTIFIANT TK_LPAREN TK_RPAREN
+
+   65 arguments: expression
+   66          | arguments TK_COMMA expression
+
+   67 instruction_condition: TK_ILA TK_LPAREN expression TK_RPAREN TK_DIR bloc
+   68                      | TK_ILA TK_LPAREN expression TK_RPAREN TK_DIR bloc TK_WILAKAN bloc
+
+   69 instruction_boucle: boucle_while
+   70                   | boucle_for
+
+   71 boucle_while: TK_HTAL TK_LPAREN expression TK_RPAREN TK_DIR bloc
+
+   72 boucle_for: for_header bloc
+
+   73 for_header: TK_MN TK_LPAREN affectation TK_RPAREN TK_L TK_LPAREN expression TK_RPAREN TK_B TK_LPAREN affectation TK_RPAREN TK_DIR
+
+   74 instruction_io: TK_KTEB TK_LPAREN expression TK_RPAREN TK_SEMICOLON
+   75               | TK_DAKHAL TK_LPAREN TK_IDENTIFIANT TK_RPAREN TK_SEMICOLON
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+TK_IDENTIFIANT (258) 6 7 15 16 19 31 60 61 62 63 64 75
+TK_STRING (259) 59
+TK_NUMBER (260) 58
+TK_RA9M (261) 8
+TK_KTABA (262) 9
+TK_WA9ILA (263) 10
+TK_LISTA (264) 11
+TK_JADWAL (265) 12
+TK_SEMICOLON (266) 6 7 30 31 32 33 74 75
+TK_LBRACKET (267) 62
+TK_RBRACKET (268) 62
+TK_LBRACE (269) 15 16 20 21
+TK_RBRACE (270) 15 16 20 21
+TK_COLON (271)
+TK_AFFECTATION (272) 6 31 32
+TK_COMMA (273) 18 66
+TK_DOT (274) 61
+TK_LPAREN (275) 15 16 55 63 64 67 68 71 73 74 75
+TK_RPAREN (276) 15 16 55 63 64 67 68 71 73 74 75
+TK_FACT (277) 56
+TK_NON (278) 39
+TK_ET (279) 37
+TK_OU (280) 38
+TK_EQUAL (281) 41
+TK_DIFF (282) 42
+TK_SUP (283) 43
+TK_INF (284) 44
+TK_SUP_EQ (285) 45
+TK_INF_EQ (286) 46
+TK_INT_DIV (287) 53
+TK_ILA (288) 67 68
+TK_WILAKAN (289) 68
+TK_ILAMAKANCH (290)
+TK_MN (291) 73
+TK_MA7ED (292)
+TK_TAWZI3 (293)
+TK_KTEB (294) 74
+TK_DAKHAL (295) 75
+TK_TAARIF (296) 6 7 15 16
+TK_RJE3 (297) 33
+TK_MAIN (298) 34
+TK_W (299)
+TK_WLA (300)
+TK_MACHI (301)
+TK_L (302) 73
+TK_B (303) 73
+TK_ADD (304) 48
+TK_SUB (305) 49
+TK_MUL (306) 51
+TK_DIV (307) 52
+TK_HITACH (308)
+TK_FI_HALAT (309)
+TK_KML_HTAL (310)
+TK_DIR (311) 67 68 71 73
+TK_FI (312)
+TK_JARRAB (313)
+TK_L_KOL (314)
+TK_ZID (315)
+TK_MSAH (316)
+TK_HTAL (317) 71
+TK_WLALA (318)
+
+
+Nonterminals, with rules where they appear
+
+$accept (64)
+    on left: 0
+programme (65)
+    on left: 1 2 3, on right: 0
+declarations_variables (66)
+    on left: 4 5, on right: 1 5
+declaration_variable (67)
+    on left: 6 7, on right: 4 5 29
+type (68)
+    on left: 8 9 10 11 12, on right: 6 7 15 16 19
+declarations_fonctions (69)
+    on left: 13 14, on right: 1 2 14
+declaration_fonction (70)
+    on left: 15 16, on right: 13 14
+parametres (71)
+    on left: 17 18, on right: 15 18
+parametre (72)
+    on left: 19, on right: 17 18
+bloc (73)
+    on left: 20 21, on right: 15 16 34 67 68 71 72
+instructions (74)
+    on left: 22 23, on right: 20 23
+instruction (75)
+    on left: 24 25 26 27 28 29 30, on right: 22 23
+affectation (76)
+    on left: 31 32, on right: 24 73
+instruction_retour (77)
+    on left: 33, on right: 27
+programme_principal (78)
+    on left: 34, on right: 1 2 3
+expression (79)
+    on left: 35, on right: 6 31 32 33 55 62 65 66 67 68 71 73 74
+expression_logique (80)
+    on left: 36 37 38 39, on right: 35 37 38
+expression_comparison (81)
+    on left: 40 41 42 43 44 45 46, on right: 36 37 38 39
+expression_arithmetique (82)
+    on left: 47 48 49, on right: 40 41 42 43 44 45 46 48 49
+terme (83)
+    on left: 50 51 52 53, on right: 47 48 49 51 52 53
+facteur (84)
+    on left: 54 55 56 57, on right: 50 51 52 53 56
+valeur (85)
+    on left: 58 59 60, on right: 54
+acces_element (86)
+    on left: 61 62, on right: 32
+appel_fonction_expr (87)
+    on left: 63 64, on right: 30 57
+arguments (88)
+    on left: 65 66, on right: 63 66
+instruction_condition (89)
+    on left: 67 68, on right: 25
+instruction_boucle (90)
+    on left: 69 70, on right: 26
+boucle_while (91)
+    on left: 71, on right: 69
+boucle_for (92)
+    on left: 72, on right: 70
+for_header (93)
+    on left: 73, on right: 72
+instruction_io (94)
+    on left: 74 75, on right: 28
+
+
+state 0
+
+    0 $accept: . programme $end
+
+    TK_TAARIF  shift, and go to state 1
+    TK_MAIN    shift, and go to state 2
+
+    programme               go to state 3
+    declarations_variables  go to state 4
+    declaration_variable    go to state 5
+    declarations_fonctions  go to state 6
+    declaration_fonction    go to state 7
+    programme_principal     go to state 8
+
+
+state 1
+
+    6 declaration_variable: TK_TAARIF . type TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON
+    7                     | TK_TAARIF . type TK_IDENTIFIANT TK_SEMICOLON
+   15 declaration_fonction: TK_TAARIF . type TK_IDENTIFIANT TK_LPAREN parametres TK_RPAREN TK_LBRACE bloc TK_RBRACE
+   16                     | TK_TAARIF . type TK_IDENTIFIANT TK_LPAREN TK_RPAREN TK_LBRACE bloc TK_RBRACE
+
+    TK_RA9M    shift, and go to state 9
+    TK_KTABA   shift, and go to state 10
+    TK_WA9ILA  shift, and go to state 11
+    TK_LISTA   shift, and go to state 12
+    TK_JADWAL  shift, and go to state 13
+
+    type  go to state 14
+
+
+state 2
+
+   34 programme_principal: TK_MAIN . bloc
+
+    TK_LBRACE  shift, and go to state 15
+
+    bloc  go to state 16
+
+
+state 3
+
+    0 $accept: programme . $end
+
+    $end  shift, and go to state 17
+
+
+state 4
+
+    1 programme: declarations_variables . declarations_fonctions programme_principal
+    5 declarations_variables: declarations_variables . declaration_variable
+
+    TK_TAARIF  shift, and go to state 1
+
+    declaration_variable    go to state 18
+    declarations_fonctions  go to state 19
+    declaration_fonction    go to state 7
+
+
+state 5
+
+    4 declarations_variables: declaration_variable .
+
+    $default  reduce using rule 4 (declarations_variables)
+
+
+state 6
+
+    2 programme: declarations_fonctions . programme_principal
+   14 declarations_fonctions: declarations_fonctions . declaration_fonction
+
+    TK_TAARIF  shift, and go to state 20
+    TK_MAIN    shift, and go to state 2
+
+    declaration_fonction  go to state 21
+    programme_principal   go to state 22
+
+
+state 7
+
+   13 declarations_fonctions: declaration_fonction .
+
+    $default  reduce using rule 13 (declarations_fonctions)
+
+
+state 8
+
+    3 programme: programme_principal .
+
+    $default  reduce using rule 3 (programme)
+
+
+state 9
+
+    8 type: TK_RA9M .
+
+    $default  reduce using rule 8 (type)
+
+
+state 10
+
+    9 type: TK_KTABA .
+
+    $default  reduce using rule 9 (type)
+
+
+state 11
+
+   10 type: TK_WA9ILA .
+
+    $default  reduce using rule 10 (type)
+
+
+state 12
+
+   11 type: TK_LISTA .
+
+    $default  reduce using rule 11 (type)
+
+
+state 13
+
+   12 type: TK_JADWAL .
+
+    $default  reduce using rule 12 (type)
+
+
+state 14
+
+    6 declaration_variable: TK_TAARIF type . TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON
+    7                     | TK_TAARIF type . TK_IDENTIFIANT TK_SEMICOLON
+   15 declaration_fonction: TK_TAARIF type . TK_IDENTIFIANT TK_LPAREN parametres TK_RPAREN TK_LBRACE bloc TK_RBRACE
+   16                     | TK_TAARIF type . TK_IDENTIFIANT TK_LPAREN TK_RPAREN TK_LBRACE bloc TK_RBRACE
+
+    TK_IDENTIFIANT  shift, and go to state 23
+
+
+state 15
+
+   20 bloc: TK_LBRACE . instructions TK_RBRACE
+   21     | TK_LBRACE . TK_RBRACE
+
+    TK_IDENTIFIANT  shift, and go to state 24
+    TK_RBRACE       shift, and go to state 25
+    TK_ILA          shift, and go to state 26
+    TK_MN           shift, and go to state 27
+    TK_KTEB         shift, and go to state 28
+    TK_DAKHAL       shift, and go to state 29
+    TK_TAARIF       shift, and go to state 30
+    TK_RJE3         shift, and go to state 31
+    TK_HTAL         shift, and go to state 32
+
+    declaration_variable   go to state 33
+    instructions           go to state 34
+    instruction            go to state 35
+    affectation            go to state 36
+    instruction_retour     go to state 37
+    acces_element          go to state 38
+    appel_fonction_expr    go to state 39
+    instruction_condition  go to state 40
+    instruction_boucle     go to state 41
+    boucle_while           go to state 42
+    boucle_for             go to state 43
+    for_header             go to state 44
+    instruction_io         go to state 45
+
+
+state 16
+
+   34 programme_principal: TK_MAIN bloc .
+
+    $default  reduce using rule 34 (programme_principal)
+
+
+state 17
+
+    0 $accept: programme $end .
+
+    $default  accept
+
+
+state 18
+
+    5 declarations_variables: declarations_variables declaration_variable .
+
+    $default  reduce using rule 5 (declarations_variables)
+
+
+state 19
+
+    1 programme: declarations_variables declarations_fonctions . programme_principal
+   14 declarations_fonctions: declarations_fonctions . declaration_fonction
+
+    TK_TAARIF  shift, and go to state 20
+    TK_MAIN    shift, and go to state 2
+
+    declaration_fonction  go to state 21
+    programme_principal   go to state 46
+
+
+state 20
+
+   15 declaration_fonction: TK_TAARIF . type TK_IDENTIFIANT TK_LPAREN parametres TK_RPAREN TK_LBRACE bloc TK_RBRACE
+   16                     | TK_TAARIF . type TK_IDENTIFIANT TK_LPAREN TK_RPAREN TK_LBRACE bloc TK_RBRACE
+
+    TK_RA9M    shift, and go to state 9
+    TK_KTABA   shift, and go to state 10
+    TK_WA9ILA  shift, and go to state 11
+    TK_LISTA   shift, and go to state 12
+    TK_JADWAL  shift, and go to state 13
+
+    type  go to state 47
+
+
+state 21
+
+   14 declarations_fonctions: declarations_fonctions declaration_fonction .
+
+    $default  reduce using rule 14 (declarations_fonctions)
+
+
+state 22
+
+    2 programme: declarations_fonctions programme_principal .
+
+    $default  reduce using rule 2 (programme)
+
+
+state 23
+
+    6 declaration_variable: TK_TAARIF type TK_IDENTIFIANT . TK_AFFECTATION expression TK_SEMICOLON
+    7                     | TK_TAARIF type TK_IDENTIFIANT . TK_SEMICOLON
+   15 declaration_fonction: TK_TAARIF type TK_IDENTIFIANT . TK_LPAREN parametres TK_RPAREN TK_LBRACE bloc TK_RBRACE
+   16                     | TK_TAARIF type TK_IDENTIFIANT . TK_LPAREN TK_RPAREN TK_LBRACE bloc TK_RBRACE
+
+    TK_SEMICOLON    shift, and go to state 48
+    TK_AFFECTATION  shift, and go to state 49
+    TK_LPAREN       shift, and go to state 50
+
+
+state 24
+
+   31 affectation: TK_IDENTIFIANT . TK_AFFECTATION expression TK_SEMICOLON
+   61 acces_element: TK_IDENTIFIANT . TK_DOT TK_IDENTIFIANT
+   62              | TK_IDENTIFIANT . TK_LBRACKET expression TK_RBRACKET
+   63 appel_fonction_expr: TK_IDENTIFIANT . TK_LPAREN arguments TK_RPAREN
+   64                    | TK_IDENTIFIANT . TK_LPAREN TK_RPAREN
+
+    TK_LBRACKET     shift, and go to state 51
+    TK_AFFECTATION  shift, and go to state 52
+    TK_DOT          shift, and go to state 53
+    TK_LPAREN       shift, and go to state 54
+
+
+state 25
+
+   21 bloc: TK_LBRACE TK_RBRACE .
+
+    $default  reduce using rule 21 (bloc)
+
+
+state 26
+
+   67 instruction_condition: TK_ILA . TK_LPAREN expression TK_RPAREN TK_DIR bloc
+   68                      | TK_ILA . TK_LPAREN expression TK_RPAREN TK_DIR bloc TK_WILAKAN bloc
+
+    TK_LPAREN  shift, and go to state 55
+
+
+state 27
+
+   73 for_header: TK_MN . TK_LPAREN affectation TK_RPAREN TK_L TK_LPAREN expression TK_RPAREN TK_B TK_LPAREN affectation TK_RPAREN TK_DIR
+
+    TK_LPAREN  shift, and go to state 56
+
+
+state 28
+
+   74 instruction_io: TK_KTEB . TK_LPAREN expression TK_RPAREN TK_SEMICOLON
+
+    TK_LPAREN  shift, and go to state 57
+
+
+state 29
+
+   75 instruction_io: TK_DAKHAL . TK_LPAREN TK_IDENTIFIANT TK_RPAREN TK_SEMICOLON
+
+    TK_LPAREN  shift, and go to state 58
+
+
+state 30
+
+    6 declaration_variable: TK_TAARIF . type TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON
+    7                     | TK_TAARIF . type TK_IDENTIFIANT TK_SEMICOLON
+
+    TK_RA9M    shift, and go to state 9
+    TK_KTABA   shift, and go to state 10
+    TK_WA9ILA  shift, and go to state 11
+    TK_LISTA   shift, and go to state 12
+    TK_JADWAL  shift, and go to state 13
+
+    type  go to state 59
+
+
+state 31
+
+   33 instruction_retour: TK_RJE3 . expression TK_SEMICOLON
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+    TK_NON          shift, and go to state 65
+
+    expression               go to state 66
+    expression_logique       go to state 67
+    expression_comparison    go to state 68
+    expression_arithmetique  go to state 69
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 32
+
+   71 boucle_while: TK_HTAL . TK_LPAREN expression TK_RPAREN TK_DIR bloc
+
+    TK_LPAREN  shift, and go to state 74
+
+
+state 33
+
+   29 instruction: declaration_variable .
+
+    $default  reduce using rule 29 (instruction)
+
+
+state 34
+
+   20 bloc: TK_LBRACE instructions . TK_RBRACE
+   23 instructions: instructions . instruction
+
+    TK_IDENTIFIANT  shift, and go to state 24
+    TK_RBRACE       shift, and go to state 75
+    TK_ILA          shift, and go to state 26
+    TK_MN           shift, and go to state 27
+    TK_KTEB         shift, and go to state 28
+    TK_DAKHAL       shift, and go to state 29
+    TK_TAARIF       shift, and go to state 30
+    TK_RJE3         shift, and go to state 31
+    TK_HTAL         shift, and go to state 32
+
+    declaration_variable   go to state 33
+    instruction            go to state 76
+    affectation            go to state 36
+    instruction_retour     go to state 37
+    acces_element          go to state 38
+    appel_fonction_expr    go to state 39
+    instruction_condition  go to state 40
+    instruction_boucle     go to state 41
+    boucle_while           go to state 42
+    boucle_for             go to state 43
+    for_header             go to state 44
+    instruction_io         go to state 45
+
+
+state 35
+
+   22 instructions: instruction .
+
+    $default  reduce using rule 22 (instructions)
+
+
+state 36
+
+   24 instruction: affectation .
+
+    $default  reduce using rule 24 (instruction)
+
+
+state 37
+
+   27 instruction: instruction_retour .
+
+    $default  reduce using rule 27 (instruction)
+
+
+state 38
+
+   32 affectation: acces_element . TK_AFFECTATION expression TK_SEMICOLON
+
+    TK_AFFECTATION  shift, and go to state 77
+
+
+state 39
+
+   30 instruction: appel_fonction_expr . TK_SEMICOLON
+
+    TK_SEMICOLON  shift, and go to state 78
+
+
+state 40
+
+   25 instruction: instruction_condition .
+
+    $default  reduce using rule 25 (instruction)
+
+
+state 41
+
+   26 instruction: instruction_boucle .
+
+    $default  reduce using rule 26 (instruction)
+
+
+state 42
+
+   69 instruction_boucle: boucle_while .
+
+    $default  reduce using rule 69 (instruction_boucle)
+
+
+state 43
+
+   70 instruction_boucle: boucle_for .
+
+    $default  reduce using rule 70 (instruction_boucle)
+
+
+state 44
+
+   72 boucle_for: for_header . bloc
+
+    TK_LBRACE  shift, and go to state 15
+
+    bloc  go to state 79
+
+
+state 45
+
+   28 instruction: instruction_io .
+
+    $default  reduce using rule 28 (instruction)
+
+
+state 46
+
+    1 programme: declarations_variables declarations_fonctions programme_principal .
+
+    $default  reduce using rule 1 (programme)
+
+
+state 47
+
+   15 declaration_fonction: TK_TAARIF type . TK_IDENTIFIANT TK_LPAREN parametres TK_RPAREN TK_LBRACE bloc TK_RBRACE
+   16                     | TK_TAARIF type . TK_IDENTIFIANT TK_LPAREN TK_RPAREN TK_LBRACE bloc TK_RBRACE
+
+    TK_IDENTIFIANT  shift, and go to state 80
+
+
+state 48
+
+    7 declaration_variable: TK_TAARIF type TK_IDENTIFIANT TK_SEMICOLON .
+
+    $default  reduce using rule 7 (declaration_variable)
+
+
+state 49
+
+    6 declaration_variable: TK_TAARIF type TK_IDENTIFIANT TK_AFFECTATION . expression TK_SEMICOLON
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+    TK_NON          shift, and go to state 65
+
+    expression               go to state 81
+    expression_logique       go to state 67
+    expression_comparison    go to state 68
+    expression_arithmetique  go to state 69
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 50
+
+   15 declaration_fonction: TK_TAARIF type TK_IDENTIFIANT TK_LPAREN . parametres TK_RPAREN TK_LBRACE bloc TK_RBRACE
+   16                     | TK_TAARIF type TK_IDENTIFIANT TK_LPAREN . TK_RPAREN TK_LBRACE bloc TK_RBRACE
+
+    TK_RA9M    shift, and go to state 9
+    TK_KTABA   shift, and go to state 10
+    TK_WA9ILA  shift, and go to state 11
+    TK_LISTA   shift, and go to state 12
+    TK_JADWAL  shift, and go to state 13
+    TK_RPAREN  shift, and go to state 82
+
+    type        go to state 83
+    parametres  go to state 84
+    parametre   go to state 85
+
+
+state 51
+
+   62 acces_element: TK_IDENTIFIANT TK_LBRACKET . expression TK_RBRACKET
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+    TK_NON          shift, and go to state 65
+
+    expression               go to state 86
+    expression_logique       go to state 67
+    expression_comparison    go to state 68
+    expression_arithmetique  go to state 69
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 52
+
+   31 affectation: TK_IDENTIFIANT TK_AFFECTATION . expression TK_SEMICOLON
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+    TK_NON          shift, and go to state 65
+
+    expression               go to state 87
+    expression_logique       go to state 67
+    expression_comparison    go to state 68
+    expression_arithmetique  go to state 69
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 53
+
+   61 acces_element: TK_IDENTIFIANT TK_DOT . TK_IDENTIFIANT
+
+    TK_IDENTIFIANT  shift, and go to state 88
+
+
+state 54
+
+   63 appel_fonction_expr: TK_IDENTIFIANT TK_LPAREN . arguments TK_RPAREN
+   64                    | TK_IDENTIFIANT TK_LPAREN . TK_RPAREN
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_RPAREN       shift, and go to state 89
+    TK_FACT         shift, and go to state 64
+    TK_NON          shift, and go to state 65
+
+    expression               go to state 90
+    expression_logique       go to state 67
+    expression_comparison    go to state 68
+    expression_arithmetique  go to state 69
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+    arguments                go to state 91
+
+
+state 55
+
+   67 instruction_condition: TK_ILA TK_LPAREN . expression TK_RPAREN TK_DIR bloc
+   68                      | TK_ILA TK_LPAREN . expression TK_RPAREN TK_DIR bloc TK_WILAKAN bloc
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+    TK_NON          shift, and go to state 65
+
+    expression               go to state 92
+    expression_logique       go to state 67
+    expression_comparison    go to state 68
+    expression_arithmetique  go to state 69
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 56
+
+   73 for_header: TK_MN TK_LPAREN . affectation TK_RPAREN TK_L TK_LPAREN expression TK_RPAREN TK_B TK_LPAREN affectation TK_RPAREN TK_DIR
+
+    TK_IDENTIFIANT  shift, and go to state 93
+
+    affectation    go to state 94
+    acces_element  go to state 38
+
+
+state 57
+
+   74 instruction_io: TK_KTEB TK_LPAREN . expression TK_RPAREN TK_SEMICOLON
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+    TK_NON          shift, and go to state 65
+
+    expression               go to state 95
+    expression_logique       go to state 67
+    expression_comparison    go to state 68
+    expression_arithmetique  go to state 69
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 58
+
+   75 instruction_io: TK_DAKHAL TK_LPAREN . TK_IDENTIFIANT TK_RPAREN TK_SEMICOLON
+
+    TK_IDENTIFIANT  shift, and go to state 96
+
+
+state 59
+
+    6 declaration_variable: TK_TAARIF type . TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON
+    7                     | TK_TAARIF type . TK_IDENTIFIANT TK_SEMICOLON
+
+    TK_IDENTIFIANT  shift, and go to state 97
+
+
+state 60
+
+   60 valeur: TK_IDENTIFIANT .
+   63 appel_fonction_expr: TK_IDENTIFIANT . TK_LPAREN arguments TK_RPAREN
+   64                    | TK_IDENTIFIANT . TK_LPAREN TK_RPAREN
+
+    TK_LPAREN  shift, and go to state 54
+
+    $default  reduce using rule 60 (valeur)
+
+
+state 61
+
+   59 valeur: TK_STRING .
+
+    $default  reduce using rule 59 (valeur)
+
+
+state 62
+
+   58 valeur: TK_NUMBER .
+
+    $default  reduce using rule 58 (valeur)
+
+
+state 63
+
+   55 facteur: TK_LPAREN . expression TK_RPAREN
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+    TK_NON          shift, and go to state 65
+
+    expression               go to state 98
+    expression_logique       go to state 67
+    expression_comparison    go to state 68
+    expression_arithmetique  go to state 69
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 64
+
+   56 facteur: TK_FACT . facteur
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+
+    facteur              go to state 99
+    valeur               go to state 72
+    appel_fonction_expr  go to state 73
+
+
+state 65
+
+   39 expression_logique: TK_NON . expression_comparison
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+
+    expression_comparison    go to state 100
+    expression_arithmetique  go to state 69
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 66
+
+   33 instruction_retour: TK_RJE3 expression . TK_SEMICOLON
+
+    TK_SEMICOLON  shift, and go to state 101
+
+
+state 67
+
+   35 expression: expression_logique .
+   37 expression_logique: expression_logique . TK_ET expression_comparison
+   38                   | expression_logique . TK_OU expression_comparison
+
+    TK_ET  shift, and go to state 102
+    TK_OU  shift, and go to state 103
+
+    $default  reduce using rule 35 (expression)
+
+
+state 68
+
+   36 expression_logique: expression_comparison .
+
+    $default  reduce using rule 36 (expression_logique)
+
+
+state 69
+
+   40 expression_comparison: expression_arithmetique .
+   41                      | expression_arithmetique . TK_EQUAL expression_arithmetique
+   42                      | expression_arithmetique . TK_DIFF expression_arithmetique
+   43                      | expression_arithmetique . TK_SUP expression_arithmetique
+   44                      | expression_arithmetique . TK_INF expression_arithmetique
+   45                      | expression_arithmetique . TK_SUP_EQ expression_arithmetique
+   46                      | expression_arithmetique . TK_INF_EQ expression_arithmetique
+   48 expression_arithmetique: expression_arithmetique . TK_ADD terme
+   49                        | expression_arithmetique . TK_SUB terme
+
+    TK_EQUAL   shift, and go to state 104
+    TK_DIFF    shift, and go to state 105
+    TK_SUP     shift, and go to state 106
+    TK_INF     shift, and go to state 107
+    TK_SUP_EQ  shift, and go to state 108
+    TK_INF_EQ  shift, and go to state 109
+    TK_ADD     shift, and go to state 110
+    TK_SUB     shift, and go to state 111
+
+    $default  reduce using rule 40 (expression_comparison)
+
+
+state 70
+
+   47 expression_arithmetique: terme .
+   51 terme: terme . TK_MUL facteur
+   52      | terme . TK_DIV facteur
+   53      | terme . TK_INT_DIV facteur
+
+    TK_INT_DIV  shift, and go to state 112
+    TK_MUL      shift, and go to state 113
+    TK_DIV      shift, and go to state 114
+
+    $default  reduce using rule 47 (expression_arithmetique)
+
+
+state 71
+
+   50 terme: facteur .
+
+    $default  reduce using rule 50 (terme)
+
+
+state 72
+
+   54 facteur: valeur .
+
+    $default  reduce using rule 54 (facteur)
+
+
+state 73
+
+   57 facteur: appel_fonction_expr .
+
+    $default  reduce using rule 57 (facteur)
+
+
+state 74
+
+   71 boucle_while: TK_HTAL TK_LPAREN . expression TK_RPAREN TK_DIR bloc
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+    TK_NON          shift, and go to state 65
+
+    expression               go to state 115
+    expression_logique       go to state 67
+    expression_comparison    go to state 68
+    expression_arithmetique  go to state 69
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 75
+
+   20 bloc: TK_LBRACE instructions TK_RBRACE .
+
+    $default  reduce using rule 20 (bloc)
+
+
+state 76
+
+   23 instructions: instructions instruction .
+
+    $default  reduce using rule 23 (instructions)
+
+
+state 77
+
+   32 affectation: acces_element TK_AFFECTATION . expression TK_SEMICOLON
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+    TK_NON          shift, and go to state 65
+
+    expression               go to state 116
+    expression_logique       go to state 67
+    expression_comparison    go to state 68
+    expression_arithmetique  go to state 69
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 78
+
+   30 instruction: appel_fonction_expr TK_SEMICOLON .
+
+    $default  reduce using rule 30 (instruction)
+
+
+state 79
+
+   72 boucle_for: for_header bloc .
+
+    $default  reduce using rule 72 (boucle_for)
+
+
+state 80
+
+   15 declaration_fonction: TK_TAARIF type TK_IDENTIFIANT . TK_LPAREN parametres TK_RPAREN TK_LBRACE bloc TK_RBRACE
+   16                     | TK_TAARIF type TK_IDENTIFIANT . TK_LPAREN TK_RPAREN TK_LBRACE bloc TK_RBRACE
+
+    TK_LPAREN  shift, and go to state 50
+
+
+state 81
+
+    6 declaration_variable: TK_TAARIF type TK_IDENTIFIANT TK_AFFECTATION expression . TK_SEMICOLON
+
+    TK_SEMICOLON  shift, and go to state 117
+
+
+state 82
+
+   16 declaration_fonction: TK_TAARIF type TK_IDENTIFIANT TK_LPAREN TK_RPAREN . TK_LBRACE bloc TK_RBRACE
+
+    TK_LBRACE  shift, and go to state 118
+
+
+state 83
+
+   19 parametre: type . TK_IDENTIFIANT
+
+    TK_IDENTIFIANT  shift, and go to state 119
+
+
+state 84
+
+   15 declaration_fonction: TK_TAARIF type TK_IDENTIFIANT TK_LPAREN parametres . TK_RPAREN TK_LBRACE bloc TK_RBRACE
+   18 parametres: parametres . TK_COMMA parametre
+
+    TK_COMMA   shift, and go to state 120
+    TK_RPAREN  shift, and go to state 121
+
+
+state 85
+
+   17 parametres: parametre .
+
+    $default  reduce using rule 17 (parametres)
+
+
+state 86
+
+   62 acces_element: TK_IDENTIFIANT TK_LBRACKET expression . TK_RBRACKET
+
+    TK_RBRACKET  shift, and go to state 122
+
+
+state 87
+
+   31 affectation: TK_IDENTIFIANT TK_AFFECTATION expression . TK_SEMICOLON
+
+    TK_SEMICOLON  shift, and go to state 123
+
+
+state 88
+
+   61 acces_element: TK_IDENTIFIANT TK_DOT TK_IDENTIFIANT .
+
+    $default  reduce using rule 61 (acces_element)
+
+
+state 89
+
+   64 appel_fonction_expr: TK_IDENTIFIANT TK_LPAREN TK_RPAREN .
+
+    $default  reduce using rule 64 (appel_fonction_expr)
+
+
+state 90
+
+   65 arguments: expression .
+
+    $default  reduce using rule 65 (arguments)
+
+
+state 91
+
+   63 appel_fonction_expr: TK_IDENTIFIANT TK_LPAREN arguments . TK_RPAREN
+   66 arguments: arguments . TK_COMMA expression
+
+    TK_COMMA   shift, and go to state 124
+    TK_RPAREN  shift, and go to state 125
+
+
+state 92
+
+   67 instruction_condition: TK_ILA TK_LPAREN expression . TK_RPAREN TK_DIR bloc
+   68                      | TK_ILA TK_LPAREN expression . TK_RPAREN TK_DIR bloc TK_WILAKAN bloc
+
+    TK_RPAREN  shift, and go to state 126
+
+
+state 93
+
+   31 affectation: TK_IDENTIFIANT . TK_AFFECTATION expression TK_SEMICOLON
+   61 acces_element: TK_IDENTIFIANT . TK_DOT TK_IDENTIFIANT
+   62              | TK_IDENTIFIANT . TK_LBRACKET expression TK_RBRACKET
+
+    TK_LBRACKET     shift, and go to state 51
+    TK_AFFECTATION  shift, and go to state 52
+    TK_DOT          shift, and go to state 53
+
+
+state 94
+
+   73 for_header: TK_MN TK_LPAREN affectation . TK_RPAREN TK_L TK_LPAREN expression TK_RPAREN TK_B TK_LPAREN affectation TK_RPAREN TK_DIR
+
+    TK_RPAREN  shift, and go to state 127
+
+
+state 95
+
+   74 instruction_io: TK_KTEB TK_LPAREN expression . TK_RPAREN TK_SEMICOLON
+
+    TK_RPAREN  shift, and go to state 128
+
+
+state 96
+
+   75 instruction_io: TK_DAKHAL TK_LPAREN TK_IDENTIFIANT . TK_RPAREN TK_SEMICOLON
+
+    TK_RPAREN  shift, and go to state 129
+
+
+state 97
+
+    6 declaration_variable: TK_TAARIF type TK_IDENTIFIANT . TK_AFFECTATION expression TK_SEMICOLON
+    7                     | TK_TAARIF type TK_IDENTIFIANT . TK_SEMICOLON
+
+    TK_SEMICOLON    shift, and go to state 48
+    TK_AFFECTATION  shift, and go to state 49
+
+
+state 98
+
+   55 facteur: TK_LPAREN expression . TK_RPAREN
+
+    TK_RPAREN  shift, and go to state 130
+
+
+state 99
+
+   56 facteur: TK_FACT facteur .
+
+    $default  reduce using rule 56 (facteur)
+
+
+state 100
+
+   39 expression_logique: TK_NON expression_comparison .
+
+    $default  reduce using rule 39 (expression_logique)
+
+
+state 101
+
+   33 instruction_retour: TK_RJE3 expression TK_SEMICOLON .
+
+    $default  reduce using rule 33 (instruction_retour)
+
+
+state 102
+
+   37 expression_logique: expression_logique TK_ET . expression_comparison
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+
+    expression_comparison    go to state 131
+    expression_arithmetique  go to state 69
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 103
+
+   38 expression_logique: expression_logique TK_OU . expression_comparison
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+
+    expression_comparison    go to state 132
+    expression_arithmetique  go to state 69
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 104
+
+   41 expression_comparison: expression_arithmetique TK_EQUAL . expression_arithmetique
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+
+    expression_arithmetique  go to state 133
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 105
+
+   42 expression_comparison: expression_arithmetique TK_DIFF . expression_arithmetique
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+
+    expression_arithmetique  go to state 134
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 106
+
+   43 expression_comparison: expression_arithmetique TK_SUP . expression_arithmetique
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+
+    expression_arithmetique  go to state 135
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 107
+
+   44 expression_comparison: expression_arithmetique TK_INF . expression_arithmetique
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+
+    expression_arithmetique  go to state 136
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 108
+
+   45 expression_comparison: expression_arithmetique TK_SUP_EQ . expression_arithmetique
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+
+    expression_arithmetique  go to state 137
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 109
+
+   46 expression_comparison: expression_arithmetique TK_INF_EQ . expression_arithmetique
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+
+    expression_arithmetique  go to state 138
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 110
+
+   48 expression_arithmetique: expression_arithmetique TK_ADD . terme
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+
+    terme                go to state 139
+    facteur              go to state 71
+    valeur               go to state 72
+    appel_fonction_expr  go to state 73
+
+
+state 111
+
+   49 expression_arithmetique: expression_arithmetique TK_SUB . terme
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+
+    terme                go to state 140
+    facteur              go to state 71
+    valeur               go to state 72
+    appel_fonction_expr  go to state 73
+
+
+state 112
+
+   53 terme: terme TK_INT_DIV . facteur
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+
+    facteur              go to state 141
+    valeur               go to state 72
+    appel_fonction_expr  go to state 73
+
+
+state 113
+
+   51 terme: terme TK_MUL . facteur
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+
+    facteur              go to state 142
+    valeur               go to state 72
+    appel_fonction_expr  go to state 73
+
+
+state 114
+
+   52 terme: terme TK_DIV . facteur
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+
+    facteur              go to state 143
+    valeur               go to state 72
+    appel_fonction_expr  go to state 73
+
+
+state 115
+
+   71 boucle_while: TK_HTAL TK_LPAREN expression . TK_RPAREN TK_DIR bloc
+
+    TK_RPAREN  shift, and go to state 144
+
+
+state 116
+
+   32 affectation: acces_element TK_AFFECTATION expression . TK_SEMICOLON
+
+    TK_SEMICOLON  shift, and go to state 145
+
+
+state 117
+
+    6 declaration_variable: TK_TAARIF type TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON .
+
+    $default  reduce using rule 6 (declaration_variable)
+
+
+state 118
+
+   16 declaration_fonction: TK_TAARIF type TK_IDENTIFIANT TK_LPAREN TK_RPAREN TK_LBRACE . bloc TK_RBRACE
+
+    TK_LBRACE  shift, and go to state 15
+
+    bloc  go to state 146
+
+
+state 119
+
+   19 parametre: type TK_IDENTIFIANT .
+
+    $default  reduce using rule 19 (parametre)
+
+
+state 120
+
+   18 parametres: parametres TK_COMMA . parametre
+
+    TK_RA9M    shift, and go to state 9
+    TK_KTABA   shift, and go to state 10
+    TK_WA9ILA  shift, and go to state 11
+    TK_LISTA   shift, and go to state 12
+    TK_JADWAL  shift, and go to state 13
+
+    type       go to state 83
+    parametre  go to state 147
+
+
+state 121
+
+   15 declaration_fonction: TK_TAARIF type TK_IDENTIFIANT TK_LPAREN parametres TK_RPAREN . TK_LBRACE bloc TK_RBRACE
+
+    TK_LBRACE  shift, and go to state 148
+
+
+state 122
+
+   62 acces_element: TK_IDENTIFIANT TK_LBRACKET expression TK_RBRACKET .
+
+    $default  reduce using rule 62 (acces_element)
+
+
+state 123
+
+   31 affectation: TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON .
+
+    $default  reduce using rule 31 (affectation)
+
+
+state 124
+
+   66 arguments: arguments TK_COMMA . expression
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+    TK_NON          shift, and go to state 65
+
+    expression               go to state 149
+    expression_logique       go to state 67
+    expression_comparison    go to state 68
+    expression_arithmetique  go to state 69
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 125
+
+   63 appel_fonction_expr: TK_IDENTIFIANT TK_LPAREN arguments TK_RPAREN .
+
+    $default  reduce using rule 63 (appel_fonction_expr)
+
+
+state 126
+
+   67 instruction_condition: TK_ILA TK_LPAREN expression TK_RPAREN . TK_DIR bloc
+   68                      | TK_ILA TK_LPAREN expression TK_RPAREN . TK_DIR bloc TK_WILAKAN bloc
+
+    TK_DIR  shift, and go to state 150
+
+
+state 127
+
+   73 for_header: TK_MN TK_LPAREN affectation TK_RPAREN . TK_L TK_LPAREN expression TK_RPAREN TK_B TK_LPAREN affectation TK_RPAREN TK_DIR
+
+    TK_L  shift, and go to state 151
+
+
+state 128
+
+   74 instruction_io: TK_KTEB TK_LPAREN expression TK_RPAREN . TK_SEMICOLON
+
+    TK_SEMICOLON  shift, and go to state 152
+
+
+state 129
+
+   75 instruction_io: TK_DAKHAL TK_LPAREN TK_IDENTIFIANT TK_RPAREN . TK_SEMICOLON
+
+    TK_SEMICOLON  shift, and go to state 153
+
+
+state 130
+
+   55 facteur: TK_LPAREN expression TK_RPAREN .
+
+    $default  reduce using rule 55 (facteur)
+
+
+state 131
+
+   37 expression_logique: expression_logique TK_ET expression_comparison .
+
+    $default  reduce using rule 37 (expression_logique)
+
+
+state 132
+
+   38 expression_logique: expression_logique TK_OU expression_comparison .
+
+    $default  reduce using rule 38 (expression_logique)
+
+
+state 133
+
+   41 expression_comparison: expression_arithmetique TK_EQUAL expression_arithmetique .
+   48 expression_arithmetique: expression_arithmetique . TK_ADD terme
+   49                        | expression_arithmetique . TK_SUB terme
+
+    TK_ADD  shift, and go to state 110
+    TK_SUB  shift, and go to state 111
+
+    $default  reduce using rule 41 (expression_comparison)
+
+
+state 134
+
+   42 expression_comparison: expression_arithmetique TK_DIFF expression_arithmetique .
+   48 expression_arithmetique: expression_arithmetique . TK_ADD terme
+   49                        | expression_arithmetique . TK_SUB terme
+
+    TK_ADD  shift, and go to state 110
+    TK_SUB  shift, and go to state 111
+
+    $default  reduce using rule 42 (expression_comparison)
+
+
+state 135
+
+   43 expression_comparison: expression_arithmetique TK_SUP expression_arithmetique .
+   48 expression_arithmetique: expression_arithmetique . TK_ADD terme
+   49                        | expression_arithmetique . TK_SUB terme
+
+    TK_ADD  shift, and go to state 110
+    TK_SUB  shift, and go to state 111
+
+    $default  reduce using rule 43 (expression_comparison)
+
+
+state 136
+
+   44 expression_comparison: expression_arithmetique TK_INF expression_arithmetique .
+   48 expression_arithmetique: expression_arithmetique . TK_ADD terme
+   49                        | expression_arithmetique . TK_SUB terme
+
+    TK_ADD  shift, and go to state 110
+    TK_SUB  shift, and go to state 111
+
+    $default  reduce using rule 44 (expression_comparison)
+
+
+state 137
+
+   45 expression_comparison: expression_arithmetique TK_SUP_EQ expression_arithmetique .
+   48 expression_arithmetique: expression_arithmetique . TK_ADD terme
+   49                        | expression_arithmetique . TK_SUB terme
+
+    TK_ADD  shift, and go to state 110
+    TK_SUB  shift, and go to state 111
+
+    $default  reduce using rule 45 (expression_comparison)
+
+
+state 138
+
+   46 expression_comparison: expression_arithmetique TK_INF_EQ expression_arithmetique .
+   48 expression_arithmetique: expression_arithmetique . TK_ADD terme
+   49                        | expression_arithmetique . TK_SUB terme
+
+    TK_ADD  shift, and go to state 110
+    TK_SUB  shift, and go to state 111
+
+    $default  reduce using rule 46 (expression_comparison)
+
+
+state 139
+
+   48 expression_arithmetique: expression_arithmetique TK_ADD terme .
+   51 terme: terme . TK_MUL facteur
+   52      | terme . TK_DIV facteur
+   53      | terme . TK_INT_DIV facteur
+
+    TK_INT_DIV  shift, and go to state 112
+    TK_MUL      shift, and go to state 113
+    TK_DIV      shift, and go to state 114
+
+    $default  reduce using rule 48 (expression_arithmetique)
+
+
+state 140
+
+   49 expression_arithmetique: expression_arithmetique TK_SUB terme .
+   51 terme: terme . TK_MUL facteur
+   52      | terme . TK_DIV facteur
+   53      | terme . TK_INT_DIV facteur
+
+    TK_INT_DIV  shift, and go to state 112
+    TK_MUL      shift, and go to state 113
+    TK_DIV      shift, and go to state 114
+
+    $default  reduce using rule 49 (expression_arithmetique)
+
+
+state 141
+
+   53 terme: terme TK_INT_DIV facteur .
+
+    $default  reduce using rule 53 (terme)
+
+
+state 142
+
+   51 terme: terme TK_MUL facteur .
+
+    $default  reduce using rule 51 (terme)
+
+
+state 143
+
+   52 terme: terme TK_DIV facteur .
+
+    $default  reduce using rule 52 (terme)
+
+
+state 144
+
+   71 boucle_while: TK_HTAL TK_LPAREN expression TK_RPAREN . TK_DIR bloc
+
+    TK_DIR  shift, and go to state 154
+
+
+state 145
+
+   32 affectation: acces_element TK_AFFECTATION expression TK_SEMICOLON .
+
+    $default  reduce using rule 32 (affectation)
+
+
+state 146
+
+   16 declaration_fonction: TK_TAARIF type TK_IDENTIFIANT TK_LPAREN TK_RPAREN TK_LBRACE bloc . TK_RBRACE
+
+    TK_RBRACE  shift, and go to state 155
+
+
+state 147
+
+   18 parametres: parametres TK_COMMA parametre .
+
+    $default  reduce using rule 18 (parametres)
+
+
+state 148
+
+   15 declaration_fonction: TK_TAARIF type TK_IDENTIFIANT TK_LPAREN parametres TK_RPAREN TK_LBRACE . bloc TK_RBRACE
+
+    TK_LBRACE  shift, and go to state 15
+
+    bloc  go to state 156
+
+
+state 149
+
+   66 arguments: arguments TK_COMMA expression .
+
+    $default  reduce using rule 66 (arguments)
+
+
+state 150
+
+   67 instruction_condition: TK_ILA TK_LPAREN expression TK_RPAREN TK_DIR . bloc
+   68                      | TK_ILA TK_LPAREN expression TK_RPAREN TK_DIR . bloc TK_WILAKAN bloc
+
+    TK_LBRACE  shift, and go to state 15
+
+    bloc  go to state 157
+
+
+state 151
+
+   73 for_header: TK_MN TK_LPAREN affectation TK_RPAREN TK_L . TK_LPAREN expression TK_RPAREN TK_B TK_LPAREN affectation TK_RPAREN TK_DIR
+
+    TK_LPAREN  shift, and go to state 158
+
+
+state 152
+
+   74 instruction_io: TK_KTEB TK_LPAREN expression TK_RPAREN TK_SEMICOLON .
+
+    $default  reduce using rule 74 (instruction_io)
+
+
+state 153
+
+   75 instruction_io: TK_DAKHAL TK_LPAREN TK_IDENTIFIANT TK_RPAREN TK_SEMICOLON .
+
+    $default  reduce using rule 75 (instruction_io)
+
+
+state 154
+
+   71 boucle_while: TK_HTAL TK_LPAREN expression TK_RPAREN TK_DIR . bloc
+
+    TK_LBRACE  shift, and go to state 15
+
+    bloc  go to state 159
+
+
+state 155
+
+   16 declaration_fonction: TK_TAARIF type TK_IDENTIFIANT TK_LPAREN TK_RPAREN TK_LBRACE bloc TK_RBRACE .
+
+    $default  reduce using rule 16 (declaration_fonction)
+
+
+state 156
+
+   15 declaration_fonction: TK_TAARIF type TK_IDENTIFIANT TK_LPAREN parametres TK_RPAREN TK_LBRACE bloc . TK_RBRACE
+
+    TK_RBRACE  shift, and go to state 160
+
+
+state 157
+
+   67 instruction_condition: TK_ILA TK_LPAREN expression TK_RPAREN TK_DIR bloc .
+   68                      | TK_ILA TK_LPAREN expression TK_RPAREN TK_DIR bloc . TK_WILAKAN bloc
+
+    TK_WILAKAN  shift, and go to state 161
+
+    $default  reduce using rule 67 (instruction_condition)
+
+
+state 158
+
+   73 for_header: TK_MN TK_LPAREN affectation TK_RPAREN TK_L TK_LPAREN . expression TK_RPAREN TK_B TK_LPAREN affectation TK_RPAREN TK_DIR
+
+    TK_IDENTIFIANT  shift, and go to state 60
+    TK_STRING       shift, and go to state 61
+    TK_NUMBER       shift, and go to state 62
+    TK_LPAREN       shift, and go to state 63
+    TK_FACT         shift, and go to state 64
+    TK_NON          shift, and go to state 65
+
+    expression               go to state 162
+    expression_logique       go to state 67
+    expression_comparison    go to state 68
+    expression_arithmetique  go to state 69
+    terme                    go to state 70
+    facteur                  go to state 71
+    valeur                   go to state 72
+    appel_fonction_expr      go to state 73
+
+
+state 159
+
+   71 boucle_while: TK_HTAL TK_LPAREN expression TK_RPAREN TK_DIR bloc .
+
+    $default  reduce using rule 71 (boucle_while)
+
+
+state 160
+
+   15 declaration_fonction: TK_TAARIF type TK_IDENTIFIANT TK_LPAREN parametres TK_RPAREN TK_LBRACE bloc TK_RBRACE .
+
+    $default  reduce using rule 15 (declaration_fonction)
+
+
+state 161
+
+   68 instruction_condition: TK_ILA TK_LPAREN expression TK_RPAREN TK_DIR bloc TK_WILAKAN . bloc
+
+    TK_LBRACE  shift, and go to state 15
+
+    bloc  go to state 163
+
+
+state 162
+
+   73 for_header: TK_MN TK_LPAREN affectation TK_RPAREN TK_L TK_LPAREN expression . TK_RPAREN TK_B TK_LPAREN affectation TK_RPAREN TK_DIR
+
+    TK_RPAREN  shift, and go to state 164
+
+
+state 163
+
+   68 instruction_condition: TK_ILA TK_LPAREN expression TK_RPAREN TK_DIR bloc TK_WILAKAN bloc .
+
+    $default  reduce using rule 68 (instruction_condition)
+
+
+state 164
+
+   73 for_header: TK_MN TK_LPAREN affectation TK_RPAREN TK_L TK_LPAREN expression TK_RPAREN . TK_B TK_LPAREN affectation TK_RPAREN TK_DIR
+
+    TK_B  shift, and go to state 165
+
+
+state 165
+
+   73 for_header: TK_MN TK_LPAREN affectation TK_RPAREN TK_L TK_LPAREN expression TK_RPAREN TK_B . TK_LPAREN affectation TK_RPAREN TK_DIR
+
+    TK_LPAREN  shift, and go to state 166
+
+
+state 166
+
+   73 for_header: TK_MN TK_LPAREN affectation TK_RPAREN TK_L TK_LPAREN expression TK_RPAREN TK_B TK_LPAREN . affectation TK_RPAREN TK_DIR
+
+    TK_IDENTIFIANT  shift, and go to state 93
+
+    affectation    go to state 167
+    acces_element  go to state 38
+
+
+state 167
+
+   73 for_header: TK_MN TK_LPAREN affectation TK_RPAREN TK_L TK_LPAREN expression TK_RPAREN TK_B TK_LPAREN affectation . TK_RPAREN TK_DIR
+
+    TK_RPAREN  shift, and go to state 168
+
+
+state 168
+
+   73 for_header: TK_MN TK_LPAREN affectation TK_RPAREN TK_L TK_LPAREN expression TK_RPAREN TK_B TK_LPAREN affectation TK_RPAREN . TK_DIR
+
+    TK_DIR  shift, and go to state 169
+
+
+state 169
+
+   73 for_header: TK_MN TK_LPAREN affectation TK_RPAREN TK_L TK_LPAREN expression TK_RPAREN TK_B TK_LPAREN affectation TK_RPAREN TK_DIR .
+
+    $default  reduce using rule 73 (for_header)

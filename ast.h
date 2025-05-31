@@ -17,7 +17,8 @@ typedef enum {
     TYPE_WA9ILA,    /* Boolean type */
     TYPE_LISTA,     /* List type */
     TYPE_JADWAL,    /* Table/structure type */
-    TYPE_FUNCTION   /* Function type */
+    TYPE_FUNCTION,  /* Function type */
+    TYPE_VOID       /* Void type */
 } SymbolType;
 
 /* Symbol categories */
@@ -99,59 +100,43 @@ typedef struct {
 
 /* AST node types */
 typedef enum {
-    /* Declarations */
-    NODE_PROGRAM,
+    NODE_NUMBER,
+    NODE_STRING,
+    NODE_IDENTIFIER,
+    NODE_BINARY_OP,
+    NODE_UNARY_OP,
     NODE_VAR_DECLARATION,
-    NODE_FUNC_DECLARATION,
-    NODE_LIST_DECLARATION,
-    NODE_JADWAL_DECLARATION,
-    
-    /* Statements */
-    NODE_ASSIGN,
+    NODE_ASSIGNMENT,
     NODE_IF,
     NODE_WHILE,
     NODE_FOR,
     NODE_RETURN,
-    NODE_BLOCK,
-    NODE_FUNC_CALL,
-    
-    /* Expressions */
-    NODE_BINARY_OP,
-    NODE_UNARY_OP,
-    NODE_IDENTIFIER,
-    NODE_NUMBER,
-    NODE_STRING,
+    NODE_FUNCTION_CALL,
+    NODE_FUNCTION_DECLARATION,
+    NODE_SEQUENCE,
+    NODE_PROGRAM,
     NODE_ARRAY_ACCESS,
     NODE_FIELD_ACCESS
-} ASTNodeType;
+} NodeType;
 
-/**
- * Binary operation types
- */
+/* Operator types */
 typedef enum {
     OP_ADD,
     OP_SUB,
     OP_MUL,
     OP_DIV,
     OP_INT_DIV,
+    OP_FACT,
     OP_AND,
     OP_OR,
+    OP_NOT,
     OP_EQ,
     OP_NEQ,
-    OP_LT,
     OP_GT,
-    OP_LE,
-    OP_GE
-} BinaryOpType;
-
-/**
- * Unary operation types
- */
-typedef enum {
-    OP_NEG,
-    OP_NOT,
-    OP_FACT
-} UnaryOpType;
+    OP_LT,
+    OP_GTE,
+    OP_LTE
+} OperatorType;
 
 /* Forward declaration for AST node */
 typedef struct ASTNode ASTNode;
@@ -159,139 +144,91 @@ typedef struct ASTNode ASTNode;
 /**
  * AST node structure
  */
-struct ASTNode {
-    ASTNodeType type;
-    
-    union {
-        /* For number literals */
-        double number_value;
-        
-        /* For string literals */
-        char *string_value;
-        
-        /* For identifiers */
-        struct {
-            char *name;
-            SymbolEntry *symbol;
-        } identifier;
-        
-        /* For variable declarations */
-        struct {
-            char *name;
-            SymbolType var_type;
-            ASTNode *init_expr;
-            SymbolEntry *symbol;
-        } var_decl;
-        
-        /* For list declarations */
-        struct {
-            char *name;
-            SymbolType element_type;
-            ASTNode **elements;
-            int num_elements;
-            SymbolEntry *symbol;
-        } list_decl;
-        
-        /* For jadwal declarations */
-        struct {
-            char *name;
-            Field *fields;
-            SymbolEntry *symbol;
-        } jadwal_decl;
-        
-        /* For function declarations */
-        struct {
-            char *name;
-            SymbolType return_type;
-            Parameter *parameters;
-            ASTNode *body;
-            SymbolEntry *symbol;
-        } func_decl;
-        
-        /* For binary operations */
-        struct {
-            BinaryOpType op;
-            ASTNode *left;
-            ASTNode *right;
-        } binary_op;
-        
-        /* For unary operations */
-        struct {
-            UnaryOpType op;
-            ASTNode *operand;
-        } unary_op;
-        
-        /* For assignments */
-        struct {
-            ASTNode *target;
-            ASTNode *value;
-        } assign;
-        
-        /* For array access */
-        struct {
-            ASTNode *array;
-            ASTNode *index;
-        } array_access;
-        
-        /* For field access */
-        struct {
-            ASTNode *record;
-            char *field_name;
-        } field_access;
-        
-        /* For if statements */
-        struct {
-            ASTNode *condition;
-            ASTNode *if_body;
-            ASTNode *else_body; /* Can be NULL if no else clause */
-        } if_stmt;
-        
-        /* For loop statements */
-        struct {
-            ASTNode *init;     /* Used in for loops */
-            ASTNode *condition;
-            ASTNode *update;   /* Used in for loops */
-            ASTNode *body;
-        } loop;
-        
-        /* For blocks of statements */
-        struct {
-            ASTNode **statements;
-            int statement_count;
-        } block;
-        
-        /* For function calls */
-        struct {
-            char *func_name;
-            ASTNode **args;
-            int arg_count;
-            SymbolEntry *symbol;
-        } func_call;
-        
-        /* For return statements */
-        struct {
-            ASTNode *expr;
-        } return_stmt;
-        
-        /* For program */
-        struct {
-            ASTNode **declarations;
-            int declaration_count;
-            ASTNode *main_function;
-        } program;
-    } data;
-    
+typedef struct ASTNode {
+    NodeType type;
     int line_number;
-};
+    union {
+        double number_value;
+        char* string_value;
+        char* identifier;
+        struct {
+            OperatorType op;
+            ASTNode* left;
+            ASTNode* right;
+        } binary_op;
+        struct {
+            OperatorType op;
+            ASTNode* operand;
+        } unary_op;
+        struct {
+            char* name;
+            SymbolType type;
+            ASTNode* initializer;
+            SymbolEntry* symbol;
+        } var_decl;
+        struct {
+            ASTNode* target;
+            ASTNode* value;
+        } assignment;
+        struct {
+            ASTNode* condition;
+            ASTNode* then_branch;
+            ASTNode* else_branch;
+        } if_stmt;
+        struct {
+            ASTNode* condition;
+            ASTNode* body;
+        } while_stmt;
+        struct {
+            ASTNode* init;
+            ASTNode* condition;
+            ASTNode* update;
+            ASTNode* body;
+        } for_stmt;
+        struct {
+            ASTNode* value;
+        } return_stmt;
+        struct {
+            char* name;
+            ASTNode** arguments;
+            int arg_count;
+            SymbolEntry* symbol;
+        } func_call;
+        struct {
+            char* name;
+            SymbolType return_type;
+            Parameter* parameters;
+            ASTNode* body;
+            SymbolEntry* symbol;
+        } func_decl;
+        struct {
+            ASTNode* first;
+            ASTNode* second;
+        } sequence;
+        struct {
+            ASTNode** declarations;
+            int decl_count;
+            ASTNode* main_block;
+        } program;
+        struct {
+            ASTNode* array;
+            ASTNode* index;
+        } array_access;
+        struct {
+            ASTNode* object;
+            char* field_name;
+        } field_access;
+    } data;
+} ASTNode;
 
 /* Function declarations for symbol table management */
 SymbolTable* create_symbol_table();
 void free_symbol_table(SymbolTable *table);
 void enter_scope(SymbolTable *table);
 void exit_scope(SymbolTable *table);
-SymbolEntry* add_symbol(SymbolTable *table, char *name, SymbolType type, SymbolCategory category, int line);
-SymbolEntry* lookup_symbol(SymbolTable *table, char *name);
-SymbolEntry* lookup_symbol_current_scope(SymbolTable *table, char *name);
+SymbolEntry* add_symbol(SymbolTable *table, const char *name, SymbolType type, SymbolCategory category, int line);
+SymbolEntry* lookup_symbol(SymbolTable *table, const char *name);
+SymbolEntry* lookup_symbol_current_scope(SymbolTable *table, const char *name);
 
 /* Function declarations for AST node creation and management */
 ASTNode* create_program_node(ASTNode **declarations, int declaration_count, ASTNode *main_function, int line);
@@ -299,8 +236,8 @@ ASTNode* create_var_declaration_node(char *name, SymbolType type, ASTNode *init_
 ASTNode* create_list_declaration_node(char *name, SymbolType element_type, ASTNode **elements, int num_elements, int line);
 ASTNode* create_jadwal_declaration_node(char *name, Field *fields, int line);
 ASTNode* create_function_declaration_node(char *name, SymbolType return_type, Parameter *parameters, ASTNode *body, int line);
-ASTNode* create_binary_op_node(BinaryOpType op, ASTNode *left, ASTNode *right, int line);
-ASTNode* create_unary_op_node(UnaryOpType op, ASTNode *operand, int line);
+ASTNode* create_binary_op_node(OperatorType op, ASTNode *left, ASTNode *right, int line);
+ASTNode* create_unary_op_node(OperatorType op, ASTNode *operand, int line);
 ASTNode* create_number_node(double value, int line);
 ASTNode* create_string_node(char *value, int line);
 ASTNode* create_identifier_node(char *name, int line);
@@ -311,8 +248,9 @@ ASTNode* create_if_node(ASTNode *condition, ASTNode *if_body, ASTNode *else_body
 ASTNode* create_while_node(ASTNode *condition, ASTNode *body, int line);
 ASTNode* create_for_node(ASTNode *init, ASTNode *condition, ASTNode *update, ASTNode *body, int line);
 ASTNode* create_block_node(ASTNode **statements, int statement_count, int line);
-ASTNode* create_function_call_node(char *func_name, ASTNode **args, int arg_count, int line);
+ASTNode* create_function_call_node(char *func_name, ASTNode **arguments, int argument_count, int line);
 ASTNode* create_return_node(ASTNode *expr, int line);
+ASTNode* create_sequence_node(ASTNode *first, ASTNode *second, int line);
 
 /* Function to free an AST node and all its children */
 void free_ast_node(ASTNode *node);

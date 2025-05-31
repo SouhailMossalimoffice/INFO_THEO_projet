@@ -40,35 +40,35 @@
       know about them.  */
    enum yytokentype {
      TK_IDENTIFIANT = 258,
-     TK_RA9M = 259,
-     TK_KTABA = 260,
-     TK_WA9ILA = 261,
-     TK_LISTA = 262,
-     TK_JADWAL = 263,
-     TK_SEMICOLON = 264,
-     TK_LBRACKET = 265,
-     TK_RBRACKET = 266,
-     TK_LBRACE = 267,
-     TK_RBRACE = 268,
-     TK_COLON = 269,
-     TK_AFFECTATION = 270,
-     TK_COMMA = 271,
-     TK_DOT = 272,
-     TK_LPAREN = 273,
-     TK_RPAREN = 274,
-     TK_FACT = 275,
-     TK_NON = 276,
-     TK_ET = 277,
-     TK_OU = 278,
-     TK_EQUAL = 279,
-     TK_DIFF = 280,
-     TK_SUP = 281,
-     TK_INF = 282,
-     TK_SUP_EQ = 283,
-     TK_INF_EQ = 284,
-     TK_INT_DIV = 285,
-     TK_NUMBER = 286,
-     TK_STRING = 287,
+     TK_STRING = 259,
+     TK_NUMBER = 260,
+     TK_RA9M = 261,
+     TK_KTABA = 262,
+     TK_WA9ILA = 263,
+     TK_LISTA = 264,
+     TK_JADWAL = 265,
+     TK_SEMICOLON = 266,
+     TK_LBRACKET = 267,
+     TK_RBRACKET = 268,
+     TK_LBRACE = 269,
+     TK_RBRACE = 270,
+     TK_COLON = 271,
+     TK_AFFECTATION = 272,
+     TK_COMMA = 273,
+     TK_DOT = 274,
+     TK_LPAREN = 275,
+     TK_RPAREN = 276,
+     TK_FACT = 277,
+     TK_NON = 278,
+     TK_ET = 279,
+     TK_OU = 280,
+     TK_EQUAL = 281,
+     TK_DIFF = 282,
+     TK_SUP = 283,
+     TK_INF = 284,
+     TK_SUP_EQ = 285,
+     TK_INF_EQ = 286,
+     TK_INT_DIV = 287,
      TK_ILA = 288,
      TK_WILAKAN = 289,
      TK_ILAMAKANCH = 290,
@@ -104,35 +104,35 @@
 #endif
 /* Tokens.  */
 #define TK_IDENTIFIANT 258
-#define TK_RA9M 259
-#define TK_KTABA 260
-#define TK_WA9ILA 261
-#define TK_LISTA 262
-#define TK_JADWAL 263
-#define TK_SEMICOLON 264
-#define TK_LBRACKET 265
-#define TK_RBRACKET 266
-#define TK_LBRACE 267
-#define TK_RBRACE 268
-#define TK_COLON 269
-#define TK_AFFECTATION 270
-#define TK_COMMA 271
-#define TK_DOT 272
-#define TK_LPAREN 273
-#define TK_RPAREN 274
-#define TK_FACT 275
-#define TK_NON 276
-#define TK_ET 277
-#define TK_OU 278
-#define TK_EQUAL 279
-#define TK_DIFF 280
-#define TK_SUP 281
-#define TK_INF 282
-#define TK_SUP_EQ 283
-#define TK_INF_EQ 284
-#define TK_INT_DIV 285
-#define TK_NUMBER 286
-#define TK_STRING 287
+#define TK_STRING 259
+#define TK_NUMBER 260
+#define TK_RA9M 261
+#define TK_KTABA 262
+#define TK_WA9ILA 263
+#define TK_LISTA 264
+#define TK_JADWAL 265
+#define TK_SEMICOLON 266
+#define TK_LBRACKET 267
+#define TK_RBRACKET 268
+#define TK_LBRACE 269
+#define TK_RBRACE 270
+#define TK_COLON 271
+#define TK_AFFECTATION 272
+#define TK_COMMA 273
+#define TK_DOT 274
+#define TK_LPAREN 275
+#define TK_RPAREN 276
+#define TK_FACT 277
+#define TK_NON 278
+#define TK_ET 279
+#define TK_OU 280
+#define TK_EQUAL 281
+#define TK_DIFF 282
+#define TK_SUP 283
+#define TK_INF 284
+#define TK_SUP_EQ 285
+#define TK_INF_EQ 286
+#define TK_INT_DIV 287
 #define TK_ILA 288
 #define TK_WILAKAN 289
 #define TK_ILAMAKANCH 290
@@ -170,13 +170,15 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 25 "LazyUi_Parser.y"
+#line 38 "LazyUi_Parser.y"
 {
     double number;
     char* string;
+    struct ASTNode* ast_node;
+    struct Parameter* param_list;
 }
 /* Line 1529 of yacc.c.  */
-#line 180 "LazyUi_Parser.tab.h"
+#line 182 "LazyUi_Parser.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

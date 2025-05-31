@@ -1,0 +1,9 @@
+taarif ra9m add(ra9m a, ra9m b) {
+    rje3 1;
+}
+
+taarif ra9m main() {
+    ra9m x = 5;
+    ra9m y = 3;
+    ra9m z = add(x, y);
+} 

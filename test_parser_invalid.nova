@@ -1,0 +1,36 @@
+-- Test des erreurs de syntaxe
+
+-- Erreur: Point-virgule manquant
+taarif ra9m x = 10
+
+-- Erreur: Parenthèse manquante
+ila x > 0 {
+    kteb("x est positif");
+}
+
+-- Erreur: Opérateur invalide
+taarif ra9m result := 10 ** 2;
+
+-- Erreur: Type manquant
+taarif y := 20;
+
+-- Erreur: Chaîne non fermée
+taarif ktaba message = "Hello NOVA;
+
+-- Erreur: Commentaire non fermé
+/* Ceci est un commentaire non fermé
+
+-- Erreur: Structure de contrôle invalide
+htal x > 0 {
+    kteb(x);
+}
+
+-- Erreur: Accès à un champ inexistant
+taarif Person p1;
+p1.invalid_field := 42;
+
+-- Erreur: Appel de fonction invalide
+calculate(10, 20, 30);  -- Trop d'arguments
+
+-- Erreur: Expression invalide
+taarif ra9m result := 10 + * 5; 

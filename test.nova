@@ -1,0 +1,68 @@
+-- Variable declarations
+taarif ra9m x = 10;
+taarif ktaba message = "Hello NOVA!";
+taarif wa9ila is_valid := true;
+
+-- Arithmetic operations
+taarif ra9m sum := 10 + 5;
+taarif ra9m diff := 20 - 8;
+taarif ra9m product := 6 * 7;
+taarif ra9m quotient := 100 div 4;
+
+-- String with escape sequences
+taarif ktaba path := "C:\\Users\\test\\file.txt";
+taarif ktaba text := "Line 1\nLine 2\tTabbed";
+
+-- Conditional statements
+ila (x > 0) {
+    kteb("x est positif");
+} ilamakanch {
+    kteb("x est négatif");
+}
+
+-- Loop
+taarif ra9m i := 1;
+htal (i <= 5) {
+    kteb(i);
+    i := i + 1;
+}
+
+-- List operations
+taarif lista ra9m numbers := [1, 2, 3, 4, 5];
+zid(numbers, 6);
+msah(numbers, 0);
+
+-- Function definition
+taarif ra9m calculate(ra9m a, ra9m b) {
+    rje3 a + b;
+}
+
+-- Main program
+main {
+    kteb(x);
+    kteb(message);
+    
+    ila x > 5 dir {
+        kteb("x is greater than 5");
+    }
+    
+    htal x > 0 dir {
+        kteb(x);
+        x = x - 1;
+    }
+    
+    rje3 0;
+}
+
+-- Test des Jadwal (tables)
+taarif jadwal Person {
+    ra9m age;
+    ktaba name;
+    wa9ila is_active;
+}
+
+-- Test des opérations sur les Jadwal
+taarif Person p1;
+p1.age := 25;
+p1.name := "John";
+p1.is_active := true; 
