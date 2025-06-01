@@ -32,6 +32,10 @@ static void lexer_error(const char* msg) {
 "ra9m"          { debug_print("Found TK_RA9M"); return TK_RA9M; }
 "rje3"          { debug_print("Found TK_RJE3"); return TK_RJE3; }
 "kteb"          { debug_print("Found TK_KTEB"); return TK_KTEB; }
+"ila"           { debug_print("Found TK_ILA"); return TK_ILA; }
+"dir"           { debug_print("Found TK_DIR"); return TK_DIR; }
+"ilamakanch"    { debug_print("Found TK_ILAMAKANCH"); return TK_ILAMAKANCH; }
+"wilakan"       { debug_print("Found TK_WILAKAN"); return TK_WILAKAN; }
 
 "+"             { debug_print("Found TK_ADD"); return TK_ADD; }
 "-"             { debug_print("Found TK_SUB"); return TK_SUB; }
@@ -64,6 +68,36 @@ static void lexer_error(const char* msg) {
 ")"             { debug_print("Found TK_RPAREN"); return TK_RPAREN; }
 ","             { debug_print("Found TK_COMMA"); return TK_COMMA; }
 ";"             { debug_print("Found TK_SEMICOLON"); return TK_SEMICOLON; }
+
+">="            { debug_print("Found TK_SUP_EQ"); return TK_SUP_EQ; }
+"<="            { debug_print("Found TK_INF_EQ"); return TK_INF_EQ; }
+">"             { debug_print("Found TK_SUP"); return TK_SUP; }
+"<"             { debug_print("Found TK_INF"); return TK_INF; }
+"=="            { debug_print("Found TK_EQUAL"); return TK_EQUAL; }
+"!="            { debug_print("Found TK_DIFF"); return TK_DIFF; }
+
+\"              { string_buf_ptr = string_buf; BEGIN(STRING); }
+<STRING>[^\"\n\\]*  { 
+    char *yptr = yytext;
+    while (*yptr) {
+        *string_buf_ptr++ = *yptr++;
+    }
+}
+<STRING>\\n    { *string_buf_ptr++ = '\n'; }
+<STRING>\\t    { *string_buf_ptr++ = '\t'; }
+<STRING>\\\"   { *string_buf_ptr++ = '\"'; }
+<STRING>\\\\   { *string_buf_ptr++ = '\\'; }
+<STRING>\"     { 
+    *string_buf_ptr = '\0';
+    BEGIN(INITIAL);
+    yylval.string = strdup(string_buf);
+    debug_print("Found string literal");
+    return TK_STRING;
+}
+<STRING>\n     { 
+    lexer_error("Unterminated string literal");
+    BEGIN(INITIAL);
+}
 
 .               { printf("UNRECOGNIZED: %s (ASCII: %d)\n", yytext, yytext[0]); }
 

@@ -1,0 +1,71 @@
+// Test file for control structures
+// This file tests if-else statements and loops
+
+// Test if-else statements
+func testIfElse() {
+    var x = 10;
+    var y = 20;
+    
+    if (x < y) {
+        print("x is less than y");
+    } else {
+        print("x is not less than y");
+    }
+    
+    if (x > y) {
+        print("x is greater than y");
+    } else if (x == y) {
+        print("x equals y");
+    } else {
+        print("x is less than y");
+    }
+}
+
+// Test while loop
+func testWhileLoop() {
+    var i = 0;
+    while (i < 5) {
+        print("i = " + i);
+        i = i + 1;
+    }
+}
+
+// Test for loop
+func testForLoop() {
+    for (var i = 0; i < 5; i = i + 1) {
+        print("i = " + i);
+    }
+}
+
+// Test nested control structures
+func testNestedControl() {
+    var x = 10;
+    var y = 20;
+    
+    if (x < y) {
+        var i = 0;
+        while (i < 3) {
+            print("Nested while loop: i = " + i);
+            i = i + 1;
+        }
+    } else {
+        for (var j = 0; j < 3; j = j + 1) {
+            print("Nested for loop: j = " + j);
+        }
+    }
+}
+
+// Run all tests
+func main() {
+    print("Testing if-else statements:");
+    testIfElse();
+    
+    print("\nTesting while loop:");
+    testWhileLoop();
+    
+    print("\nTesting for loop:");
+    testForLoop();
+    
+    print("\nTesting nested control structures:");
+    testNestedControl();
+} 

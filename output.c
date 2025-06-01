@@ -1,35 +1,23 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-double add(double a, double b);
-double subtract(double a, double b);
-double multiply(double a, double b);
-double divide(double a, double b);
-double add(double a, double b) {
-    return (a + b);
-}
-
-double subtract(double a, double b) {
-    return (a - b);
-}
-
-double multiply(double a, double b) {
-    return (a * b);
-}
-
-double divide(double a, double b) {
-    return (a / b);
-}
+char* num_to_str(double n) { char buf[32]; snprintf(buf, sizeof(buf), "%g", n); return strdup(buf); }
+char* str_concat(const char* a, const char* b) { size_t l1 = strlen(a), l2 = strlen(b); char* r = malloc(l1+l2+1); strcpy(r,a); strcat(r,b); return r; }
 
 int main() {
     double x = 10.000000;
     double y = 5.000000;
-    double sum = add(x, y);
-    double diff = subtract(x, y);
-    double prod = multiply(x, y);
-    double quot = divide(x, y);
-    printf("%f\n", sum);
-    printf("%f\n", diff);
-    printf("%f\n", prod);
-    printf("%f\n", quot);
+    if ((x > y)) {
+    printf("%s\n", "x is greater than y");
+    } else {
+    printf("%s\n", "x is not greater than y");
+    }
+    double i = 0.000000;
+    while ((i < 5.000000)) {
+    printf("%s\n", str_concat("i = ", num_to_str(i)));
+    i = (i + 1.000000);
+    }
+    return 0.000000;
     return 0;
 }

@@ -36,6 +36,15 @@ void generate_function_call(ASTNode *node);
 // Generate print statement code
 void generate_print(ASTNode *node);
 
+// Generate if statement code
+void generate_if(ASTNode *node);
+
+// Generate while loop code
+void generate_while(ASTNode *node);
+
+// Generate for loop code
+void generate_for(ASTNode *node);
+
 // Generate code entry point
 void generate_code_entry(ASTNode* ast_root);
 

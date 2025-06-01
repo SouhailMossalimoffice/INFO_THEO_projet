@@ -1,11 +1,18 @@
-taarif ra9m x = 10;
-ila (x > 0) {
-    kteb("x est positif");
-} ilamakanch {
-    kteb("x est négatif");
-}
-
-htal (x > 0) {
-    kteb(x);
-    x = x - 1;
+taarif ra9m main() {
+    ra9m x = 10;
+    ra9m y = 5;
+    
+    ila (x > y) dir {
+        kteb("x is greater than y");
+    } ilamakanch {
+        kteb("x is not greater than y");
+    }
+    
+    ra9m i = 0;
+    wilakan (i < 5) dir {
+        kteb("i = " + i);
+        i = i + 1;
+    }
+    
+    rje3 0;
 }

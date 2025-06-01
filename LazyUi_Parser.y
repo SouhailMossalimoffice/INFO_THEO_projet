@@ -132,7 +132,7 @@ void extract_main_function(ASTNode* decls, ASTNode** out_decls, ASTNode** out_ma
 %right TK_FACT
 
 /* Define types for non-terminals */
-%type <ast_node> programme declarations_fonctions declaration_fonction expression expression_arithmetique terme facteur instructions instruction instruction_retour declaration_variable affectation appel_fonction_expr arguments bloc instruction_print
+%type <ast_node> programme declarations_fonctions declaration_fonction expression expression_arithmetique terme facteur instructions instruction instruction_retour declaration_variable affectation appel_fonction_expr arguments bloc instruction_print instruction_condition instruction_while
 %type <param_list> parametres parametre
 
 %%
@@ -212,6 +212,8 @@ instruction
     | affectation { debug_print("Reducing: affectation"); $$ = $1; }
     | appel_fonction_expr TK_SEMICOLON { debug_print("Reducing: function call"); $$ = $1; }
     | instruction_print { debug_print("Reducing: print statement"); $$ = $1; }
+    | instruction_condition { debug_print("Reducing: if/else statement"); $$ = $1; }
+    | instruction_while { debug_print("Reducing: while statement"); $$ = $1; }
     ;
 
 instruction_print
@@ -248,6 +250,32 @@ instruction_retour
 
 expression
     : expression_arithmetique { $$ = $1; }
+    | TK_STRING { $$ = create_string_node($1, yylineno); }
+    | expression TK_ADD expression
+    {
+        debug_print("Found string concatenation or addition");
+        $$ = create_binary_op_node(OP_ADD, $1, $3, yylineno);
+    }
+    | expression TK_SUP expression
+    {
+        debug_print("Found greater than comparison");
+        $$ = create_binary_op_node(OP_GT, $1, $3, yylineno);
+    }
+    | expression TK_INF expression
+    {
+        debug_print("Found less than comparison");
+        $$ = create_binary_op_node(OP_LT, $1, $3, yylineno);
+    }
+    | expression TK_EQUAL expression
+    {
+        debug_print("Found equality comparison");
+        $$ = create_binary_op_node(OP_EQ, $1, $3, yylineno);
+    }
+    | expression TK_DIFF expression
+    {
+        debug_print("Found inequality comparison");
+        $$ = create_binary_op_node(OP_NEQ, $1, $3, yylineno);
+    }
     ;
 
 expression_arithmetique
@@ -323,6 +351,27 @@ bloc
     {
         debug_print("Found block");
         $$ = $2;
+    }
+    ;
+
+instruction_condition
+    : TK_ILA TK_LPAREN expression TK_RPAREN TK_DIR bloc
+    {
+        debug_print("Found if statement");
+        $$ = create_if_node($3, $6, NULL, yylineno);
+    }
+    | TK_ILA TK_LPAREN expression TK_RPAREN TK_DIR bloc TK_ILAMAKANCH bloc
+    {
+        debug_print("Found if-else statement");
+        $$ = create_if_node($3, $6, $8, yylineno);
+    }
+    ;
+
+instruction_while
+    : TK_WILAKAN TK_LPAREN expression TK_RPAREN TK_DIR bloc
+    {
+        debug_print("Found while statement");
+        $$ = create_while_node($3, $6, yylineno);
     }
     ;
 
