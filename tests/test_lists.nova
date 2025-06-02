@@ -1,0 +1,16 @@
+taarif ra9m main() {
+    lista numbers := [1, 2, 3, 4, 5];
+    
+    ra9m sum := 0;
+    l_kol ra9m num fi numbers {
+        sum := sum + num;
+    }
+    
+    kteb(sum);
+    
+    zid(numbers, 6);
+    kteb(numbers);
+    
+    msah(numbers, 0);
+    kteb(numbers);
+} 

@@ -1,0 +1,80 @@
+-- Valid semantic test program
+
+-- Variable declarations with correct types
+taarif ra9m x = 10;
+taarif ktaba msg = "Merhba!";
+taarif wa9ila flag = 1;
+
+-- Function declaration with parameters and return type
+taarif ra9m add(ra9m a, ra9m b) {
+    rje3 a + b;
+}
+
+-- Function with multiple types and nested scope
+taarif ktaba process(ra9m value, ktaba prefix) {
+    taarif ra9m temp = value * 2;
+    taarif ktaba result = prefix + " : " + temp;
+    rje3 result;
+}
+
+main {
+    -- Variable declarations in nested scope
+    taarif ra9m y = 20;
+    
+    -- Valid function calls
+    taarif ra9m sum = add(x, y);
+    taarif ktaba output = process(sum, "Result");
+    
+    -- Control structures with correct types
+    ila (sum > 25) dir {
+        kteb(output);
+    } wilakan {
+        kteb("Sum is too small");
+    }
+    
+    -- Loop with valid condition and operations
+    taarif ra9m i = 0;
+    htal (i < 5) dir {
+        taarif ra9m squared = i * i;
+        kteb(squared);
+        i = i + 1;
+    }
+}
+
+# Valid variable declarations
+taarif ra9m l'age = 25;
+taarif ktaba l'nom = "John";
+taarif wa9ila l'active = vrai;
+
+# Valid function declaration
+taarif ra9m l'calculate(ra9m l'x, ra9m l'y) {
+    taarif ra9m l'result = l'x + l'y;
+    rje3 l'result;
+}
+
+# Valid function call
+taarif ra9m l'sum = l'calculate(10, 20);
+
+# Valid control structures
+ila (l'age > 18) dir {
+    kteb("Adult");
+} wilakan {
+    kteb("Minor");
+}
+
+# Valid loop
+mn (l'i = 0) l (l'i < 5) b (l'i = l'i + 1) dir {
+    kteb(l'i);
+}
+
+# Valid array operations
+taarif lista l'numbers = [1, 2, 3, 4, 5];
+taarif ra9m l'first = l'numbers[0];
+
+# Valid type conversions
+taarif ktaba l'str_num = "123";
+taarif ra9m l'num = l'str_num -> number;
+
+# Valid boolean operations
+taarif wa9ila l'is_valid = vrai w l'is_active;
+taarif wa9ila l'is_invalid = ma3ndix l'is_valid; 

@@ -1,0 +1,30 @@
+taarif ra9m main() {
+    ra9m a := 10;
+    ra9m b := 5;
+    ra9m c := 2;
+    
+    kteb("Test 1: a + b * c");
+    ra9m result1 := a + b * c;
+    kteb("Result = ");
+    kteb(result1);
+    
+    kteb("Test 2: (a + b) * c");
+    ra9m result2 := (a + b) * c;
+    kteb("Result = ");
+    kteb(result2);
+    
+    kteb("Test 3: a - b / c");
+    ra9m result3 := a - b / c;
+    kteb("Result = ");
+    kteb(result3);
+    
+    kteb("Test 4: a * b + c");
+    ra9m result4 := a * b + c;
+    kteb("Result = ");
+    kteb(result4);
+    
+    kteb("Test 5: a / b - c");
+    ra9m result5 := a / b - c;
+    kteb("Result = ");
+    kteb(result5);
+} 

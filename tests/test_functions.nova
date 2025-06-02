@@ -1,0 +1,18 @@
+taarif ra9m add(ra9m x, ra9m y) {
+    rje3 x + y;
+}
+
+taarif ra9m factorial(ra9m n) {
+    ila (n <= 1) {
+        rje3 1;
+    }
+    rje3 n * factorial(n - 1);
+}
+
+taarif ra9m main() {
+    ra9m sum := add(5, 3);
+    kteb(sum);
+    
+    ra9m fact := factorial(5);
+    kteb(fact);
+} 

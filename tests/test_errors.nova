@@ -1,0 +1,21 @@
+taarif ra9m main() {
+    jarrab {
+        ra9m x := 10 / 0;
+    } htal {
+        kteb(1);
+    }
+    
+    jarrab {
+        lista empty := [];
+        kteb(empty[0]);
+    } htal {
+        kteb(2);
+    }
+    
+    jarrab {
+        ra9m x;
+        kteb(x);
+    } htal {
+        kteb(3);
+    }
+} 

@@ -1,0 +1,12 @@
+taarif ra9m main() {
+    jadwal person := {
+        age := 25,
+        height := 180
+    };
+    
+    kteb(person.age);
+    kteb(person.height);
+    
+    person.age := 26;
+    kteb(person.age);
+} 

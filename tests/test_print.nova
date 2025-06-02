@@ -1,0 +1,7 @@
+taarif ra9m main() {
+    ra9m x = 42;
+    kteb("Value of x = ");
+    kteb(x);
+    kteb("Testing string literal: Hello, world!");
+    rje3 0;
+} 

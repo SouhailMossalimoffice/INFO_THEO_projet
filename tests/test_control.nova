@@ -1,0 +1,35 @@
+taarif ra9m main() {
+    ra9m a := 10;
+    ra9m b := 5;
+    
+    kteb("Testing if statement");
+    ila (b > a) {
+        kteb("a + b = ");
+        kteb(a + b);
+    }
+    
+    kteb("Testing if-else statement");
+    ila (b > a) {
+        kteb("b - a = ");
+        kteb(b - a);
+    } ilamakanch {
+        kteb("b = ");
+        kteb(b);
+    }
+    
+    kteb("Testing while loop");
+    ra9m count := 0;
+    hitach (count < 5) {
+        count := count + 1;
+        kteb("count * 10 = ");
+        kteb(count * 10);
+    }
+    
+    kteb("Testing for loop");
+    ra9m i := 1;
+    l (i <= 3) {
+        kteb("i * 2 = ");
+        kteb(i * 2);
+        i := i + 1;
+    }
+} 

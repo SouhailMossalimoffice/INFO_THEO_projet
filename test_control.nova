@@ -1,0 +1,11 @@
+taarif ra9m x = 10;
+ila (x > 0) {
+    kteb("x est positif");
+} ilamakanch {
+    kteb("x est négatif");
+}
+
+htal (x > 0) {
+    kteb(x);
+    x = x - 1;
+}

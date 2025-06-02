@@ -1,0 +1,40 @@
+taarif ra9m add(ra9m x, ra9m y) {
+    rje3 x + y;
+}
+
+taarif ra9m subtract(ra9m x, ra9m y) {
+    rje3 x - y;
+}
+
+taarif ra9m multiply(ra9m x, ra9m y) {
+    rje3 x * y;
+}
+
+taarif ra9m divide(ra9m x, ra9m y) {
+    rje3 x / y;
+}
+
+taarif ra9m main() {
+    ra9m a := 10;
+    ra9m b := 5;
+    
+    kteb("Testing add function");
+    ra9m sum := add(a, b);
+    kteb("a + b = ");
+    kteb(sum);
+    
+    kteb("Testing subtract function");
+    ra9m diff := subtract(a, b);
+    kteb("a - b = ");
+    kteb(diff);
+    
+    kteb("Testing multiply function");
+    ra9m product := multiply(a, b);
+    kteb("a * b = ");
+    kteb(product);
+    
+    kteb("Testing divide function");
+    ra9m quotient := divide(a, b);
+    kteb("a / b = ");
+    kteb(quotient);
+} 

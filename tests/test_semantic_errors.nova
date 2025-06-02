@@ -1,0 +1,87 @@
+-- Semantic errors test program
+
+-- Duplicate variable declaration in same scope
+taarif ra9m x = 10;
+taarif ra9m x = 20;  -- Error: duplicate variable
+
+-- Type mismatch in assignment
+taarif ra9m number = "string";  -- Error: type mismatch
+
+-- Undeclared variable usage
+taarif ra9m sum = y + 10;  -- Error: y is not declared
+
+-- Function declaration with type mismatch in return
+taarif ra9m bad_func() {
+    rje3 "not a number";  -- Error: returning string from ra9m function
+}
+
+-- Function with parameter type mismatch
+taarif ktaba concat(ktaba s1, ktaba s2) {
+    rje3 s1 + s2;
+}
+
+main {
+    -- Invalid function call (wrong argument types)
+    taarif ktaba result = concat(10, 20);  -- Error: passing numbers to ktaba parameters
+    
+    -- Using undefined function
+    taarif ra9m val = unknown_func();  -- Error: undefined function
+    
+    -- Type mismatch in condition
+    ila ("not a boolean") dir {  -- Error: non-boolean condition
+        kteb("This is wrong");
+    }
+    
+    -- Invalid operation between types
+    taarif ra9m z = 5;
+    taarif ktaba str = "hello";
+    taarif ra9m invalid = z * str;  -- Error: cannot multiply number and string
+    
+    -- Assignment to undeclared variable
+    missing = 100;  -- Error: undeclared variable
+    
+    -- Type mismatch in loop condition
+    htal ("invalid condition") dir {  -- Error: non-boolean condition
+        kteb("Wrong");
+    }
+}
+
+# Duplicate variable declaration
+taarif ra9m l'age = 25;
+taarif ra9m l'age = 30;  # Error: l'age already declared
+
+# Undeclared variable usage
+taarif ra9m l'result = l'unknown_var;  # Error: l'unknown_var not declared
+
+# Type mismatch in assignment
+taarif ra9m l'number = "123";  # Error: cannot assign string to number
+taarif ktaba l'text = 42;  # Error: cannot assign number to string
+
+# Invalid function call
+taarif ra9m l'result = l'unknown_func(10);  # Error: l'unknown_func not declared
+
+# Invalid array access
+taarif lista l'arr = [1, 2, 3];
+taarif ra9m l'value = l'arr["index"];  # Error: array index must be number
+
+# Invalid type conversion
+taarif ktaba l'str = "hello";
+taarif ra9m l'num = l'str -> number;  # Error: cannot convert "hello" to number
+
+# Invalid boolean operation
+taarif ra9m l'result = 42 w vrai;  # Error: cannot use w with number
+
+# Invalid return type
+taarif ra9m l'get_number() {
+    rje3 "123";  # Error: function should return number
+}
+
+# Invalid parameter type
+taarif ra9m l'process(ra9m l'x) {
+    taarif ra9m l'result = l'x + "text";  # Error: cannot add number and string
+}
+
+# Invalid control structure condition
+ila ("string") dir {  # Error: condition must be boolean
+    kteb("Invalid");
+} 

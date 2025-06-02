@@ -1,0 +1,8 @@
+taarif ra9m add(ra9m a, ra9m b) {
+    rje3 a + b;
+}
+
+main {
+    taarif ra9m result = add(5, 3);
+    kteb(result);
+}
