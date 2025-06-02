@@ -21,6 +21,7 @@ static void lexer_error(const char* msg) {
 %}
 
 %option noyywrap
+%option yylineno
 
 %x STRING
 %x COMMENT_LINE

@@ -163,8 +163,27 @@ extern FILE *yyin, *yyout;
 #define EOB_ACT_END_OF_FILE 1
 #define EOB_ACT_LAST_MATCH 2
     
-    #define YY_LESS_LINENO(n)
-    #define YY_LINENO_REWIND_TO(ptr)
+    /* Note: We specifically omit the test for yy_rule_can_match_eol because it requires
+     *       access to the local variable yy_act. Since yyless() is a macro, it would break
+     *       existing scanners that call yyless() from OUTSIDE yylex.
+     *       One obvious solution it to make yy_act a global. I tried that, and saw
+     *       a 5% performance hit in a non-yylineno scanner, because yy_act is
+     *       normally declared as a register variable-- so it is not worth it.
+     */
+    #define  YY_LESS_LINENO(n) \
+            do { \
+                yy_size_t yyl;\
+                for ( yyl = n; yyl < yyleng; ++yyl )\
+                    if ( yytext[yyl] == '\n' )\
+                        --yylineno;\
+            }while(0)
+    #define YY_LINENO_REWIND_TO(dst) \
+            do {\
+                const char *p;\
+                for ( p = yy_cp-1; p >= (dst); --p)\
+                    if ( *p == '\n' )\
+                        --yylineno;\
+            }while(0)
     
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
@@ -504,6 +523,13 @@ static const flex_int16_t yy_chk[191] =
       113,  113,  113,  113,  113,  113,  113,  113,  113,  113
     } ;
 
+/* Table of booleans, true if rule could match eol. */
+static const flex_int32_t yy_rule_can_match_eol[48] =
+    {   0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 1, 0, 0,     };
+
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
 
@@ -539,9 +565,9 @@ static void debug_print(const char* msg) {
 static void lexer_error(const char* msg) {
     fprintf(stderr, "Error at line %d: %s\n", yylineno, msg);
 }
-#line 542 "lex.yy.c"
+#line 568 "lex.yy.c"
 
-#line 544 "lex.yy.c"
+#line 570 "lex.yy.c"
 
 #define INITIAL 0
 #define STRING 1
@@ -761,10 +787,10 @@ YY_DECL
 		}
 
 	{
-#line 29 "LazyUi_Analex.l"
+#line 30 "LazyUi_Analex.l"
 
 
-#line 767 "lex.yy.c"
+#line 793 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -810,6 +836,16 @@ yy_find_action:
 
 		YY_DO_BEFORE_ACTION;
 
+		if ( yy_act != YY_END_OF_BUFFER && yy_rule_can_match_eol[yy_act] )
+			{
+			yy_size_t yyl;
+			for ( yyl = 0; yyl < yyleng; ++yyl )
+				if ( yytext[yyl] == '\n' )
+					
+    yylineno++;
+;
+			}
+
 do_action:	/* This label is used only to access EOF actions. */
 
 		switch ( yy_act )
@@ -823,108 +859,108 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 31 "LazyUi_Analex.l"
+#line 32 "LazyUi_Analex.l"
 { debug_print("Found TK_TAARIF"); return TK_TAARIF; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 32 "LazyUi_Analex.l"
+#line 33 "LazyUi_Analex.l"
 { debug_print("Found TK_RA9M"); return TK_RA9M; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 33 "LazyUi_Analex.l"
+#line 34 "LazyUi_Analex.l"
 { debug_print("Found TK_RJE3"); return TK_RJE3; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 34 "LazyUi_Analex.l"
+#line 35 "LazyUi_Analex.l"
 { debug_print("Found TK_KTEB"); return TK_KTEB; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 35 "LazyUi_Analex.l"
+#line 36 "LazyUi_Analex.l"
 { debug_print("Found TK_ILA"); return TK_ILA; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 36 "LazyUi_Analex.l"
+#line 37 "LazyUi_Analex.l"
 { debug_print("Found TK_DIR"); return TK_DIR; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 37 "LazyUi_Analex.l"
+#line 38 "LazyUi_Analex.l"
 { debug_print("Found TK_ILAMAKANCH"); return TK_ILAMAKANCH; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 38 "LazyUi_Analex.l"
+#line 39 "LazyUi_Analex.l"
 { debug_print("Found TK_WILAKAN"); return TK_WILAKAN; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 39 "LazyUi_Analex.l"
+#line 40 "LazyUi_Analex.l"
 { debug_print("Found TK_KTABA"); return TK_KTABA; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 40 "LazyUi_Analex.l"
+#line 41 "LazyUi_Analex.l"
 { debug_print("Found TK_WA9ILA"); return TK_WA9ILA; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 41 "LazyUi_Analex.l"
+#line 42 "LazyUi_Analex.l"
 { debug_print("Found TK_LISTA"); return TK_LISTA; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 42 "LazyUi_Analex.l"
+#line 43 "LazyUi_Analex.l"
 { debug_print("Found TK_WLA"); return TK_WLA; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 44 "LazyUi_Analex.l"
+#line 45 "LazyUi_Analex.l"
 { debug_print("Found TK_ADD"); return TK_ADD; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 45 "LazyUi_Analex.l"
+#line 46 "LazyUi_Analex.l"
 { debug_print("Found TK_SUB"); return TK_SUB; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 46 "LazyUi_Analex.l"
+#line 47 "LazyUi_Analex.l"
 { debug_print("Found TK_MUL"); return TK_MUL; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 47 "LazyUi_Analex.l"
+#line 48 "LazyUi_Analex.l"
 { debug_print("Found TK_DIV"); return TK_DIV; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 49 "LazyUi_Analex.l"
+#line 50 "LazyUi_Analex.l"
 { debug_print("Found TK_AFFECTATION"); return TK_AFFECTATION; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 50 "LazyUi_Analex.l"
+#line 51 "LazyUi_Analex.l"
 { debug_print("Found TK_AFFECTATION"); return TK_AFFECTATION; }
 	YY_BREAK
 case 19:
 /* rule 19 can match eol */
 YY_RULE_SETUP
-#line 52 "LazyUi_Analex.l"
+#line 53 "LazyUi_Analex.l"
 { /* Ignore whitespace */ }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 54 "LazyUi_Analex.l"
+#line 55 "LazyUi_Analex.l"
 { /* Ignore single-line comments */ }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 56 "LazyUi_Analex.l"
+#line 57 "LazyUi_Analex.l"
 { 
     debug_print("Found identifier");
     yylval.string = strdup(yytext);
@@ -933,7 +969,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 62 "LazyUi_Analex.l"
+#line 63 "LazyUi_Analex.l"
 { 
     debug_print("Found number");
     yylval.number = atof(yytext);
@@ -942,87 +978,87 @@ YY_RULE_SETUP
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 68 "LazyUi_Analex.l"
+#line 69 "LazyUi_Analex.l"
 { debug_print("Found TK_COLON"); return TK_COLON; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 69 "LazyUi_Analex.l"
+#line 70 "LazyUi_Analex.l"
 { debug_print("Found TK_LBRACE"); return TK_LBRACE; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 70 "LazyUi_Analex.l"
+#line 71 "LazyUi_Analex.l"
 { debug_print("Found TK_RBRACE"); return TK_RBRACE; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 71 "LazyUi_Analex.l"
+#line 72 "LazyUi_Analex.l"
 { debug_print("Found TK_LPAREN"); return TK_LPAREN; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 72 "LazyUi_Analex.l"
+#line 73 "LazyUi_Analex.l"
 { debug_print("Found TK_RPAREN"); return TK_RPAREN; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 73 "LazyUi_Analex.l"
+#line 74 "LazyUi_Analex.l"
 { debug_print("Found TK_COMMA"); return TK_COMMA; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 74 "LazyUi_Analex.l"
+#line 75 "LazyUi_Analex.l"
 { debug_print("Found TK_SEMICOLON"); return TK_SEMICOLON; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 76 "LazyUi_Analex.l"
+#line 77 "LazyUi_Analex.l"
 { debug_print("Found TK_SUP_EQ"); return TK_SUP_EQ; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 77 "LazyUi_Analex.l"
+#line 78 "LazyUi_Analex.l"
 { debug_print("Found TK_INF_EQ"); return TK_INF_EQ; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 78 "LazyUi_Analex.l"
+#line 79 "LazyUi_Analex.l"
 { debug_print("Found TK_SUP"); return TK_SUP; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 79 "LazyUi_Analex.l"
+#line 80 "LazyUi_Analex.l"
 { debug_print("Found TK_INF"); return TK_INF; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 80 "LazyUi_Analex.l"
+#line 81 "LazyUi_Analex.l"
 { debug_print("Found TK_EQUAL"); return TK_EQUAL; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 81 "LazyUi_Analex.l"
+#line 82 "LazyUi_Analex.l"
 { debug_print("Found TK_DIFF"); return TK_DIFF; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 83 "LazyUi_Analex.l"
+#line 84 "LazyUi_Analex.l"
 { debug_print("Found boolean true"); yylval.number = 1; return TK_NUMBER; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 84 "LazyUi_Analex.l"
+#line 85 "LazyUi_Analex.l"
 { debug_print("Found boolean false"); yylval.number = 0; return TK_NUMBER; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 86 "LazyUi_Analex.l"
+#line 87 "LazyUi_Analex.l"
 { string_buf_ptr = string_buf; BEGIN(STRING); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 87 "LazyUi_Analex.l"
+#line 88 "LazyUi_Analex.l"
 { 
     char *yptr = yytext;
     while (*yptr) {
@@ -1032,27 +1068,27 @@ YY_RULE_SETUP
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 93 "LazyUi_Analex.l"
+#line 94 "LazyUi_Analex.l"
 { *string_buf_ptr++ = '\n'; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 94 "LazyUi_Analex.l"
+#line 95 "LazyUi_Analex.l"
 { *string_buf_ptr++ = '\t'; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 95 "LazyUi_Analex.l"
+#line 96 "LazyUi_Analex.l"
 { *string_buf_ptr++ = '\"'; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 96 "LazyUi_Analex.l"
+#line 97 "LazyUi_Analex.l"
 { *string_buf_ptr++ = '\\'; }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 97 "LazyUi_Analex.l"
+#line 98 "LazyUi_Analex.l"
 { 
     *string_buf_ptr = '\0';
     BEGIN(INITIAL);
@@ -1064,7 +1100,7 @@ YY_RULE_SETUP
 case 45:
 /* rule 45 can match eol */
 YY_RULE_SETUP
-#line 104 "LazyUi_Analex.l"
+#line 105 "LazyUi_Analex.l"
 { 
     lexer_error("Unterminated string literal");
     BEGIN(INITIAL);
@@ -1072,15 +1108,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 109 "LazyUi_Analex.l"
+#line 110 "LazyUi_Analex.l"
 { printf("UNRECOGNIZED: %s (ASCII: %d)\n", yytext, yytext[0]); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 111 "LazyUi_Analex.l"
+#line 112 "LazyUi_Analex.l"
 ECHO;
 	YY_BREAK
-#line 1083 "lex.yy.c"
+#line 1119 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(STRING):
 case YY_STATE_EOF(COMMENT_LINE):
@@ -1451,6 +1487,10 @@ static int yy_get_next_buffer (void)
 
 	*--yy_cp = (char) c;
 
+    if ( c == '\n' ){
+        --yylineno;
+    }
+
 	(yytext_ptr) = yy_bp;
 	(yy_hold_char) = *yy_cp;
 	(yy_c_buf_p) = yy_cp;
@@ -1527,6 +1567,11 @@ static int yy_get_next_buffer (void)
 	c = *(unsigned char *) (yy_c_buf_p);	/* cast for 8-bit char's */
 	*(yy_c_buf_p) = '\0';	/* preserve yytext */
 	(yy_hold_char) = *++(yy_c_buf_p);
+
+	if ( c == '\n' )
+		
+    yylineno++;
+;
 
 	return c;
 }
@@ -1994,6 +2039,9 @@ static int yy_init_globals (void)
      * This function is called from yylex_destroy(), so don't allocate here.
      */
 
+    /* We do not touch yylineno unless the option is enabled. */
+    yylineno =  1;
+    
     (yy_buffer_stack) = NULL;
     (yy_buffer_stack_top) = 0;
     (yy_buffer_stack_max) = 0;
@@ -2088,6 +2136,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 111 "LazyUi_Analex.l"
+#line 112 "LazyUi_Analex.l"
 
 

@@ -1,17 +1,17 @@
 taarif ra9m add(ra9m a, ra9m b) {
-    rje3 a + b;
+    raje3 (a + b);
 }
 
 taarif ra9m subtract(ra9m a, ra9m b) {
-    rje3 a - b;
+    raje3 (a - b);
 }
 
 taarif ra9m multiply(ra9m a, ra9m b) {
-    rje3 a * b;
+    raje3 (a * b);
 }
 
 taarif ra9m divide(ra9m a, ra9m b) {
-    rje3 a / b;
+    raje3 (a / b);
 }
 
 taarif ra9m main() {

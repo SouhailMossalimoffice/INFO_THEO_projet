@@ -211,14 +211,14 @@ instructions
     ;
 
 instruction
-    : instruction_retour { debug_print("Reducing: instruction_retour"); $$ = $1; }
-    | instruction_ktib { debug_print("Reducing: instruction_ktib"); $$ = $1; }
-    | declaration_variable { debug_print("Reducing: declaration_variable"); $$ = $1; }
+    : declaration_variable { debug_print("Reducing: declaration_variable"); $$ = $1; }
     | affectation { debug_print("Reducing: affectation"); $$ = $1; }
-    | appel_fonction_expr TK_SEMICOLON { debug_print("Reducing: function call"); $$ = $1; }
     | instruction_print { debug_print("Reducing: print statement"); $$ = $1; }
+    | instruction_ktib { debug_print("Reducing: ktib statement"); $$ = $1; }
     | instruction_condition { debug_print("Reducing: if/else statement"); $$ = $1; }
     | instruction_while { debug_print("Reducing: while statement"); $$ = $1; }
+    | instruction_retour { debug_print("Reducing: return statement"); $$ = $1; }
+    | appel_fonction_expr TK_SEMICOLON { debug_print("Reducing: function call"); $$ = $1; }
     ;
 
 instruction_print
@@ -414,6 +414,8 @@ instruction_while
 %%
 
 void yyerror(const char* s) {
+    int tok = yylex();
+    fprintf(stderr, "Error at line %d: %s. Next token: %d\n", yylineno, s, tok);
     parser_error(s);
 }
 

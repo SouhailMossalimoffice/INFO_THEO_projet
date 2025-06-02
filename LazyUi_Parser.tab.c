@@ -620,8 +620,8 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyprhs[] =
 {
        0,     0,     3,     5,     7,    10,    18,    25,    27,    31,
-      34,    35,    37,    40,    42,    44,    46,    48,    51,    53,
-      55,    57,    63,    67,    71,    73,    79,    85,    91,    97,
+      34,    35,    37,    40,    42,    44,    46,    48,    50,    52,
+      54,    57,    63,    67,    71,    73,    79,    85,    91,    97,
      102,   104,   106,   110,   114,   118,   122,   126,   130,   131,
      133,   137,   139,   143,   147,   149,   153,   157,   159,   161,
      166,   170,   172,   177,   181,   183,   187,   191,   198,   207,
@@ -635,8 +635,8 @@ static const yytype_int8 yyrhs[] =
       41,     6,     3,    20,    69,    21,    86,    -1,    41,     6,
        3,    20,    21,    86,    -1,    70,    -1,    69,    18,    70,
       -1,     6,     3,    -1,    -1,    72,    -1,    71,    72,    -1,
-      74,    -1,    75,    -1,    77,    -1,    78,    -1,    84,    11,
-      -1,    73,    -1,    87,    -1,    88,    -1,    39,    20,    79,
+      77,    -1,    78,    -1,    73,    -1,    75,    -1,    87,    -1,
+      88,    -1,    74,    -1,    84,    11,    -1,    39,    20,    79,
       21,    11,    -1,    42,    79,    11,    -1,    64,    76,    11,
       -1,     4,    -1,     6,     3,    17,    79,    11,    -1,     7,
        3,    17,    79,    11,    -1,     8,     3,    17,    79,    11,
@@ -726,8 +726,8 @@ static const yytype_uint8 yyr1[] =
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     1,     1,     2,     7,     6,     1,     3,     2,
-       0,     1,     2,     1,     1,     1,     1,     2,     1,     1,
-       1,     5,     3,     3,     1,     5,     5,     5,     5,     4,
+       0,     1,     2,     1,     1,     1,     1,     1,     1,     1,
+       2,     5,     3,     3,     1,     5,     5,     5,     5,     4,
        1,     1,     3,     3,     3,     3,     3,     3,     0,     1,
        3,     1,     3,     3,     1,     3,     3,     1,     1,     4,
        3,     1,     4,     3,     1,     3,     3,     6,     8,     8,
@@ -742,10 +742,10 @@ static const yytype_uint8 yydefact[] =
        0,     0,     0,     2,     3,     0,     1,     4,     0,     0,
        0,     0,     0,     7,     9,    10,     6,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-      11,    18,    13,    14,    15,    16,     0,    19,    20,     8,
+      11,    15,    19,    16,    13,    14,     0,    17,    18,     8,
        5,     0,     0,     0,     0,     0,     0,     0,     0,     0,
       48,    31,    47,    38,     0,     0,    30,    41,    44,    51,
-      24,     0,    56,    12,    17,     0,    53,    54,     0,     0,
+      24,     0,    56,    12,    20,     0,    53,    54,     0,     0,
        0,     0,     0,     0,     0,     0,     0,    39,     0,     0,
       22,     0,     0,     0,     0,     0,     0,     0,     0,     0,
       23,    29,     0,    52,     0,     0,     0,     0,     0,     0,
@@ -1761,42 +1761,42 @@ yyreduce:
 
   case 13:
 #line 214 "LazyUi_Parser.y"
-    { debug_print("Reducing: instruction_retour"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
+    { debug_print("Reducing: declaration_variable"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
     break;
 
   case 14:
 #line 215 "LazyUi_Parser.y"
-    { debug_print("Reducing: instruction_ktib"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
+    { debug_print("Reducing: affectation"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
     break;
 
   case 15:
 #line 216 "LazyUi_Parser.y"
-    { debug_print("Reducing: declaration_variable"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
+    { debug_print("Reducing: print statement"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
     break;
 
   case 16:
 #line 217 "LazyUi_Parser.y"
-    { debug_print("Reducing: affectation"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
+    { debug_print("Reducing: ktib statement"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
     break;
 
   case 17:
 #line 218 "LazyUi_Parser.y"
-    { debug_print("Reducing: function call"); (yyval.ast_node) = (yyvsp[(1) - (2)].ast_node); ;}
+    { debug_print("Reducing: if/else statement"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
     break;
 
   case 18:
 #line 219 "LazyUi_Parser.y"
-    { debug_print("Reducing: print statement"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
+    { debug_print("Reducing: while statement"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
     break;
 
   case 19:
 #line 220 "LazyUi_Parser.y"
-    { debug_print("Reducing: if/else statement"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
+    { debug_print("Reducing: return statement"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
     break;
 
   case 20:
 #line 221 "LazyUi_Parser.y"
-    { debug_print("Reducing: while statement"); (yyval.ast_node) = (yyvsp[(1) - (1)].ast_node); ;}
+    { debug_print("Reducing: function call"); (yyval.ast_node) = (yyvsp[(1) - (2)].ast_node); ;}
     break;
 
   case 21:
@@ -2294,6 +2294,8 @@ yyreturn:
 
 
 void yyerror(const char* s) {
+    int tok = yylex();
+    fprintf(stderr, "Error at line %d: %s. Next token: %d\n", yylineno, s, tok);
     parser_error(s);
 }
 

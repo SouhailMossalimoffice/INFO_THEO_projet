@@ -60,10 +60,25 @@ static void emit_number_to_string_expr(ASTNode* node) {
     fprintf(output_file, ")");
 }
 
+// Helper: emit string literal with C escaping
+static void emit_c_escaped_string(const char* s) {
+    fputc('"', output_file);
+    for (const char* p = s; *p; ++p) {
+        switch (*p) {
+            case '\n': fputs("\\n", output_file); break;
+            case '\t': fputs("\\t", output_file); break;
+            case '"':  fputs("\\\"", output_file); break;
+            case '\\': fputs("\\\\", output_file); break;
+            default: fputc(*p, output_file); break;
+        }
+    }
+    fputc('"', output_file);
+}
+
 // Helper: emit string expression (handles string, number, or concatenation)
 static void emit_string_expr(ASTNode* node) {
     if (node->type == NODE_STRING) {
-        fprintf(output_file, "\"%s\"", node->data.string_value);
+        emit_c_escaped_string(node->data.string_value);
     } else if (node->type == NODE_NUMBER) {
         emit_number_to_string_expr(node);
     } else if (node->type == NODE_IDENTIFIER) {
@@ -84,45 +99,64 @@ static void emit_string_expr(ASTNode* node) {
 // At the top of generate_program, emit helper functions
 void generate_program(ASTNode* node) {
     fprintf(output_file, "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\n");
+    
     // Helper for number to string
-    fprintf(output_file, "char* num_to_str(double n) { char buf[32]; snprintf(buf, sizeof(buf), \"%%g\", n); return strdup(buf); }\n");
+    fprintf(output_file, "char* num_to_str(double n) {\n");
+    fprintf(output_file, "    char* buf = malloc(32);\n");
+    fprintf(output_file, "    snprintf(buf, 32, \"%%g\", n);\n");
+    fprintf(output_file, "    return buf;\n");
+    fprintf(output_file, "}\n\n");
+    
     // Helper for string concatenation
-    fprintf(output_file, "char* str_concat(const char* a, const char* b) { size_t l1 = strlen(a), l2 = strlen(b); char* r = malloc(l1+l2+1); strcpy(r,a); strcat(r,b); return r; }\n\n");
+    fprintf(output_file, "char* str_concat(const char* a, const char* b) {\n");
+    fprintf(output_file, "    if (!a) a = \"\";\n");
+    fprintf(output_file, "    if (!b) b = \"\";\n");
+    fprintf(output_file, "    size_t l1 = strlen(a), l2 = strlen(b);\n");
+    fprintf(output_file, "    char* r = malloc(l1 + l2 + 1);\n");
+    fprintf(output_file, "    strcpy(r, a);\n");
+    fprintf(output_file, "    strcat(r, b);\n");
+    fprintf(output_file, "    return r;\n");
+    fprintf(output_file, "}\n\n");
+    
     // Emit function prototypes
     if (node->type == NODE_PROGRAM) {
         emit_function_prototypes(node->data.program.declarations);
     }
+    
     // Emit all non-main function definitions
     if (node->type == NODE_PROGRAM) {
         emit_function_definitions(node->data.program.declarations);
     }
+    
     // Generate main function
     fprintf(output_file, "int main() {\n");
     if (node->type == NODE_PROGRAM && node->data.program.main_function) {
-        // Emit the body of the LazyUi main function here
         generate_code(node->data.program.main_function->data.func_decl.body);
     }
     fprintf(output_file, "    return 0;\n}\n");
 }
 
 void generate_function_declaration(ASTNode* node) {
-    // Only generate non-main functions
     if (strcmp(node->data.func_decl.name, "main") == 0) {
         return;
     }
     
     fprintf(output_file, "double %s(", node->data.func_decl.name);
-    
-    // Generate parameters
     Parameter* param = node->data.func_decl.parameters;
+    int first = 1;
     while (param) {
+        if (!first) fprintf(output_file, ", ");
         fprintf(output_file, "double %s", param->name);
         param = param->next;
-        if (param) fprintf(output_file, ", ");
+        first = 0;
     }
-    
     fprintf(output_file, ") {\n");
+    
+    // Generate function body
     generate_code(node->data.func_decl.body);
+    
+    // Add default return if none exists
+    fprintf(output_file, "    return 0;\n");
     fprintf(output_file, "}\n\n");
 }
 
@@ -152,8 +186,10 @@ void generate_assignment(ASTNode* node) {
 
 void generate_binary_op(ASTNode* node) {
     if (node->data.binary_op.op == OP_ADD &&
-        (node->data.binary_op.left->type == NODE_STRING || node->data.binary_op.right->type == NODE_STRING ||
-         node->data.binary_op.left->type == NODE_BINARY_OP || node->data.binary_op.right->type == NODE_BINARY_OP)) {
+        (node->data.binary_op.left->type == NODE_STRING || 
+         node->data.binary_op.right->type == NODE_STRING ||
+         node->data.binary_op.left->type == NODE_BINARY_OP || 
+         node->data.binary_op.right->type == NODE_BINARY_OP)) {
         emit_string_expr(node);
     } else {
         fprintf(output_file, "(");
@@ -177,30 +213,28 @@ void generate_binary_op(ASTNode* node) {
 }
 
 void generate_function_call(ASTNode* node) {
-    fprintf(output_file, "%s(", node->data.func_call.name);
-    
-    // Arguments as sequence node
+    fprintf(output_file, "    %s(", node->data.func_call.name);
     if (node->data.func_call.arguments && node->data.func_call.arg_count > 0) {
         for (int i = 0; i < node->data.func_call.arg_count; i++) {
             if (i > 0) fprintf(output_file, ", ");
             generate_code(node->data.func_call.arguments[i]);
         }
     }
-    
-    fprintf(output_file, ")");
+    fprintf(output_file, ");\n");
 }
 
 void generate_print(ASTNode* node) {
-    // If the expression is a string or a string concatenation, use %s
-    if (node->data.print_stmt.expression->type == NODE_STRING ||
-        (node->data.print_stmt.expression->type == NODE_BINARY_OP &&
-         node->data.print_stmt.expression->data.binary_op.op == OP_ADD)) {
-        fprintf(output_file, "    printf(\"%%s\\n\", ");
-        emit_string_expr(node->data.print_stmt.expression);
+    ASTNode* expr = node->data.print_stmt.expression;
+    fprintf(output_file, "    ");
+    
+    if (expr->type == NODE_STRING ||
+        (expr->type == NODE_BINARY_OP && expr->data.binary_op.op == OP_ADD)) {
+        fprintf(output_file, "printf(\"%%s\\n\", ");
+        emit_string_expr(expr);
         fprintf(output_file, ");\n");
     } else {
-        fprintf(output_file, "    printf(\"%%f\\n\", ");
-        generate_code(node->data.print_stmt.expression);
+        fprintf(output_file, "printf(\"%%g\\n\", ");
+        generate_code(expr);
         fprintf(output_file, ");\n");
     }
 }
@@ -288,7 +322,7 @@ void generate_code(ASTNode* node) {
             generate_for(node);
             break;
         case NODE_STRING:
-            fprintf(output_file, "\"%s\"", node->data.string_value);
+            emit_c_escaped_string(node->data.string_value);
             break;
         default:
             fprintf(stderr, "Error: Unknown node type in code generation\n");
