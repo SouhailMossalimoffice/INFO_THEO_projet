@@ -99,7 +99,8 @@
      TK_ZID = 315,
      TK_MSAH = 316,
      TK_HTAL = 317,
-     TK_WLALA = 318
+     TK_WLALA = 318,
+     TK_KTIB = 319
    };
 #endif
 /* Tokens.  */
@@ -164,6 +165,7 @@
 #define TK_MSAH 316
 #define TK_HTAL 317
 #define TK_WLALA 318
+#define TK_KTIB 319
 
 
 
@@ -178,7 +180,7 @@ typedef union YYSTYPE
     struct Parameter* param_list;
 }
 /* Line 1529 of yacc.c.  */
-#line 182 "LazyUi_Parser.tab.h"
+#line 184 "LazyUi_Parser.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

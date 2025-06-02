@@ -3,6 +3,17 @@
  */
 
 #include "ast.h"
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* Forward declarations of helper functions */
+static void semantic_error(int line, const char* format, ...);
+static SymbolType get_expression_type(ASTNode* node, SymbolTable* table);
+static int is_type_compatible(SymbolType left, SymbolType right);
+static int check_array_element_types(ASTNode* array_literal, SymbolType expected_type);
+static SymbolType get_array_element_type(ASTNode* array_literal);
 
 /* ------------------- Symbol Table Management Functions ------------------- */
 
@@ -541,6 +552,7 @@ ASTNode* create_array_access_node(ASTNode* array, ASTNode* index, int line_numbe
     node->line_number = line_number;
     node->data.array_access.array = array;
     node->data.array_access.index = index;
+    node->data.array_access.element_type = TYPE_UNKNOWN;  /* Initialize to unknown */
     
     return node;
 }
@@ -655,6 +667,38 @@ ASTNode* create_print_node(ASTNode *expression, int line) {
 }
 
 /**
+ * Create an array elements node
+ */
+ASTNode* create_array_elements_node(ASTNode* element, ASTNode* next) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
+    if (!node) {
+        fprintf(stderr, "Error: Memory allocation failed\n");
+        exit(1);
+    }
+    node->type = NODE_ARRAY_ELEMENTS;
+    node->line_number = element ? element->line_number : 0;
+    node->data.array_elements.element = element;
+    node->data.array_elements.next = next;
+    return node;
+}
+
+/**
+ * Create an array literal node
+ */
+ASTNode* create_array_literal_node(ASTNode* elements, int line) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
+    if (!node) {
+        fprintf(stderr, "Error: Memory allocation failed\n");
+        exit(1);
+    }
+    node->type = NODE_ARRAY_LITERAL;
+    node->line_number = line;
+    node->data.array_elements.element = elements;
+    node->data.array_elements.next = NULL;
+    return node;
+}
+
+/**
  * Free an AST node and all its children
  */
 void free_ast_node(ASTNode* node) {
@@ -752,6 +796,16 @@ void free_ast_node(ASTNode* node) {
         case NODE_PRINT:
             free_ast_node(node->data.print_stmt.expression);
             break;
+            
+        case NODE_ARRAY_LITERAL: {
+            // Analyze array elements
+            ASTNode* elements = node->data.array_elements.element;
+            while (elements) {
+                free_ast_node(elements);
+                elements = elements->data.array_elements.next;
+            }
+            break;
+        }
             
         default:
             break;
@@ -1064,6 +1118,28 @@ void print_ast(ASTNode* node, int indent) {
             print_ast(node->data.print_stmt.expression, indent + 2);
             break;
             
+        case NODE_ARRAY_LITERAL: {
+            // Analyze array elements
+            ASTNode* elements = node->data.array_elements.element;
+            if (elements) {
+                // Get the type of the first element
+                SymbolType first_type = get_expression_type(elements, NULL);
+                
+                // Check that all elements have compatible types
+                if (!check_array_element_types(node, first_type)) {
+                    semantic_error(node->line_number,
+                        "Array elements must have compatible types");
+                }
+                
+                // Analyze each element
+                while (elements) {
+                    analyze_ast(elements, NULL);
+                    elements = elements->data.array_elements.next;
+                }
+            }
+            break;
+        }
+            
         default:
             printf("Unknown Node Type: %d (line %d)\n", node->type, node->line_number);
             break;
@@ -1072,15 +1148,33 @@ void print_ast(ASTNode* node, int indent) {
 
 /* ------------------- Semantic Analysis Functions ------------------- */
 
+/* Helper function for semantic error reporting */
+static void semantic_error(int line, const char* format, ...) {
+    va_list args;
+    va_start(args, format);
+    fprintf(stderr, "Semantic Error at line %d: ", line);
+    vfprintf(stderr, format, args);
+    fprintf(stderr, "\n");
+    va_end(args);
+}
+
 /* Helper function to check type compatibility */
-static int is_type_compatible(SymbolType left_type, SymbolType right_type) {
-    if (left_type == right_type) return 1;
+static int is_type_compatible(SymbolType left, SymbolType right) {
+    /* Special case for numeric types */
+    if ((left == TYPE_RA9M || left == TYPE_WA9ILA) && 
+        (right == TYPE_RA9M || right == TYPE_WA9ILA)) {
+        return 1;
+    }
     
-    // Special cases for type compatibility
-    if (left_type == TYPE_RA9M && right_type == TYPE_WA9ILA) return 1;
-    if (left_type == TYPE_WA9ILA && right_type == TYPE_RA9M) return 1;
+    /* Special case for array types */
+    if (left == TYPE_LISTA && right == TYPE_LISTA) {
+        /* For now, consider all arrays compatible */
+        /* TODO: In a more sophisticated implementation, we would check element types */
+        return 1;
+    }
     
-    return 0;
+    /* For all other types, they must match exactly */
+    return left == right;
 }
 
 /* Helper function to get expression type */
@@ -1095,8 +1189,19 @@ static SymbolType get_expression_type(ASTNode* node, SymbolTable* table) {
             return TYPE_KTABA;
             
         case NODE_IDENTIFIER: {
+            if (!table) return TYPE_UNKNOWN;
             SymbolEntry* entry = lookup_symbol(table, node->data.identifier);
             return entry ? entry->type : TYPE_UNKNOWN;
+        }
+        
+        case NODE_ARRAY_LITERAL:
+            return TYPE_LISTA;
+            
+        case NODE_ARRAY_ACCESS: {
+            if (node->data.array_access.element_type != TYPE_UNKNOWN) {
+                return node->data.array_access.element_type;
+            }
+            return TYPE_RA9M; // Default to RA9M if element type is unknown
         }
         
         case NODE_BINARY_OP: {
@@ -1163,6 +1268,45 @@ static SymbolType get_expression_type(ASTNode* node, SymbolTable* table) {
     }
 }
 
+/* Helper function to check array element types */
+static int check_array_element_types(ASTNode* array_literal, SymbolType expected_type) {
+    if (!array_literal || array_literal->type != NODE_ARRAY_LITERAL) {
+        return 0;
+    }
+    
+    ASTNode* current = array_literal->data.array_elements.element;
+    while (current) {
+        analyze_ast(current, NULL);
+        SymbolType element_type = get_expression_type(current, NULL);
+        
+        if (!is_type_compatible(expected_type, element_type)) {
+            semantic_error(current->line_number,
+                "Array element type mismatch: expected %s but got %s",
+                symbol_type_to_string(expected_type),
+                symbol_type_to_string(element_type));
+            return 0;
+        }
+        
+        current = current->data.array_elements.next;
+    }
+    
+    return 1;
+}
+
+/* Helper function to get array element type */
+static SymbolType get_array_element_type(ASTNode* array_literal) {
+    if (!array_literal || array_literal->type != NODE_ARRAY_LITERAL) {
+        return TYPE_UNKNOWN;
+    }
+    
+    ASTNode* first_element = array_literal->data.array_elements.element;
+    if (!first_element) {
+        return TYPE_UNKNOWN;
+    }
+    
+    return get_expression_type(first_element, NULL);
+}
+
 /**
  * Perform semantic analysis on the AST
  */
@@ -1192,8 +1336,9 @@ void analyze_ast(ASTNode* node, SymbolTable* table) {
         case NODE_VAR_DECLARATION: {
             /* Check for duplicate declaration in current scope */
             if (lookup_symbol_current_scope(table, node->data.var_decl.name)) {
-                fprintf(stderr, "Error at line %d: Variable '%s' already declared in current scope\n",
-                        node->line_number, node->data.var_decl.name);
+                semantic_error(node->line_number, 
+                    "Variable '%s' already declared in current scope", 
+                    node->data.var_decl.name);
                 break;
             }
             
@@ -1211,9 +1356,20 @@ void analyze_ast(ASTNode* node, SymbolTable* table) {
                 analyze_ast(node->data.var_decl.initializer, table);
                 SymbolType init_type = get_expression_type(node->data.var_decl.initializer, table);
                 
+                if (node->data.var_decl.type == TYPE_LISTA && init_type == TYPE_LISTA) {
+                    // For array types, store the element type
+                    SymbolType element_type = get_array_element_type(node->data.var_decl.initializer);
+                    if (element_type != TYPE_UNKNOWN) {
+                        node->data.var_decl.symbol->value.list_info.element_type = element_type;
+                    }
+                }
+                
                 if (!is_type_compatible(node->data.var_decl.type, init_type)) {
-                    fprintf(stderr, "Error at line %d: Type mismatch in initialization of '%s'\n",
-                            node->line_number, node->data.var_decl.name);
+                    semantic_error(node->line_number,
+                        "Type mismatch in initialization of '%s': expected %s but got %s",
+                        node->data.var_decl.name,
+                        symbol_type_to_string(node->data.var_decl.type),
+                        symbol_type_to_string(init_type));
                 }
             }
             break;
@@ -1222,8 +1378,9 @@ void analyze_ast(ASTNode* node, SymbolTable* table) {
         case NODE_FUNCTION_DECLARATION: {
             /* Check for duplicate function declaration */
             if (lookup_symbol_current_scope(table, node->data.func_decl.name)) {
-                fprintf(stderr, "Error at line %d: Function '%s' already declared\n",
-                        node->line_number, node->data.func_decl.name);
+                semantic_error(node->line_number,
+                    "Function '%s' already declared",
+                    node->data.func_decl.name);
                 break;
             }
             
@@ -1276,16 +1433,20 @@ void analyze_ast(ASTNode* node, SymbolTable* table) {
                 case OP_DIV:
                 case OP_INT_DIV:
                     if (left_type != TYPE_RA9M || right_type != TYPE_RA9M) {
-                        fprintf(stderr, "Error at line %d: Arithmetic operation requires numeric operands\n",
-                                node->line_number);
+                        semantic_error(node->line_number,
+                            "Arithmetic operation requires numeric operands, got %s and %s",
+                            symbol_type_to_string(left_type),
+                            symbol_type_to_string(right_type));
                     }
                     break;
                     
                 case OP_AND:
                 case OP_OR:
                     if (left_type != TYPE_WA9ILA || right_type != TYPE_WA9ILA) {
-                        fprintf(stderr, "Error at line %d: Logical operation requires boolean operands\n",
-                                node->line_number);
+                        semantic_error(node->line_number,
+                            "Logical operation requires boolean operands, got %s and %s",
+                            symbol_type_to_string(left_type),
+                            symbol_type_to_string(right_type));
                     }
                     break;
                     
@@ -1301,8 +1462,9 @@ void analyze_ast(ASTNode* node, SymbolTable* table) {
             if (node->data.unary_op.op == OP_NOT) {
                 SymbolType operand_type = get_expression_type(node->data.unary_op.operand, table);
                 if (operand_type != TYPE_WA9ILA) {
-                    fprintf(stderr, "Error at line %d: Logical NOT operation requires boolean operand\n",
-                            node->line_number);
+                    semantic_error(node->line_number,
+                        "Logical NOT operation requires boolean operand, got %s",
+                        symbol_type_to_string(operand_type));
                 }
             }
             break;
@@ -1311,8 +1473,9 @@ void analyze_ast(ASTNode* node, SymbolTable* table) {
             /* Check if identifier is declared */
             SymbolEntry* entry = lookup_symbol(table, node->data.identifier);
             if (!entry) {
-                fprintf(stderr, "Error at line %d: Undefined identifier '%s'\n",
-                        node->line_number, node->data.identifier);
+                semantic_error(node->line_number,
+                    "Undefined identifier '%s'",
+                    node->data.identifier);
             }
             break;
         }
@@ -1325,8 +1488,10 @@ void analyze_ast(ASTNode* node, SymbolTable* table) {
             SymbolType value_type = get_expression_type(node->data.assignment.value, table);
             
             if (!is_type_compatible(target_type, value_type)) {
-                fprintf(stderr, "Error at line %d: Type mismatch in assignment\n",
-                        node->line_number);
+                semantic_error(node->line_number,
+                    "Type mismatch in assignment: cannot assign %s to %s",
+                    symbol_type_to_string(value_type),
+                    symbol_type_to_string(target_type));
             }
             break;
         }
@@ -1336,8 +1501,9 @@ void analyze_ast(ASTNode* node, SymbolTable* table) {
             
             SymbolType cond_type = get_expression_type(node->data.if_stmt.condition, table);
             if (cond_type != TYPE_WA9ILA) {
-                fprintf(stderr, "Error at line %d: Condition must be of boolean type\n",
-                        node->line_number);
+                semantic_error(node->line_number,
+                    "Condition must be of boolean type, got %s",
+                    symbol_type_to_string(cond_type));
             }
             
             enter_scope(table);
@@ -1356,8 +1522,9 @@ void analyze_ast(ASTNode* node, SymbolTable* table) {
             
             SymbolType while_cond_type = get_expression_type(node->data.while_stmt.condition, table);
             if (while_cond_type != TYPE_WA9ILA) {
-                fprintf(stderr, "Error at line %d: Loop condition must be of boolean type\n",
-                        node->line_number);
+                semantic_error(node->line_number,
+                    "Loop condition must be of boolean type, got %s",
+                    symbol_type_to_string(while_cond_type));
             }
             
             enter_scope(table);
@@ -1374,8 +1541,9 @@ void analyze_ast(ASTNode* node, SymbolTable* table) {
             
             SymbolType for_cond_type = get_expression_type(node->data.for_stmt.condition, table);
             if (for_cond_type != TYPE_WA9ILA) {
-                fprintf(stderr, "Error at line %d: For loop condition must be of boolean type\n",
-                        node->line_number);
+                semantic_error(node->line_number,
+                    "For loop condition must be of boolean type, got %s",
+                    symbol_type_to_string(for_cond_type));
             }
             
             analyze_ast(node->data.for_stmt.body, table);
@@ -1406,8 +1574,10 @@ void analyze_ast(ASTNode* node, SymbolTable* table) {
                 {
                     SymbolType actual_type = get_expression_type(node->data.return_stmt.value, table);
                     if (!is_type_compatible(expected_type, actual_type)) {
-                        fprintf(stderr, "Error at line %d: Return type mismatch\n",
-                                node->line_number);
+                        semantic_error(node->line_number,
+                            "Return type mismatch: expected %s but got %s",
+                            symbol_type_to_string(expected_type),
+                            symbol_type_to_string(actual_type));
                     }
                 }
             }
@@ -1418,14 +1588,16 @@ void analyze_ast(ASTNode* node, SymbolTable* table) {
             /* Check if function exists */
             SymbolEntry* func = lookup_symbol(table, node->data.func_call.name);
             if (!func) {
-                fprintf(stderr, "Error at line %d: Undefined function '%s'\n",
-                        node->line_number, node->data.func_call.name);
+                semantic_error(node->line_number,
+                    "Undefined function '%s'",
+                    node->data.func_call.name);
                 break;
             }
             
             if (func->category != SYMBOL_FUNCTION) {
-                fprintf(stderr, "Error at line %d: '%s' is not a function\n",
-                        node->line_number, node->data.func_call.name);
+                semantic_error(node->line_number,
+                    "'%s' is not a function",
+                    node->data.func_call.name);
                 break;
             }
             
@@ -1440,8 +1612,12 @@ void analyze_ast(ASTNode* node, SymbolTable* table) {
                 
                 SymbolType arg_type = get_expression_type(node->data.func_call.arguments[arg_index], table);
                 if (!is_type_compatible(param->type, arg_type)) {
-                    fprintf(stderr, "Error at line %d: Type mismatch in argument %d of call to '%s'\n",
-                            node->line_number, arg_index + 1, node->data.func_call.name);
+                    semantic_error(node->line_number,
+                        "Type mismatch in argument %d of call to '%s': expected %s but got %s",
+                        arg_index + 1,
+                        node->data.func_call.name,
+                        symbol_type_to_string(param->type),
+                        symbol_type_to_string(arg_type));
                 }
                 
                 param = param->next;
@@ -1449,13 +1625,15 @@ void analyze_ast(ASTNode* node, SymbolTable* table) {
             }
             
             if (param) {
-                fprintf(stderr, "Error at line %d: Too few arguments in call to '%s'\n",
-                        node->line_number, node->data.func_call.name);
+                semantic_error(node->line_number,
+                    "Too few arguments in call to '%s'",
+                    node->data.func_call.name);
             }
             
             if (arg_index < node->data.func_call.arg_count) {
-                fprintf(stderr, "Error at line %d: Too many arguments in call to '%s'\n",
-                        node->line_number, node->data.func_call.name);
+                semantic_error(node->line_number,
+                    "Too many arguments in call to '%s'",
+                    node->data.func_call.name);
             }
             break;
         }
@@ -1465,37 +1643,42 @@ void analyze_ast(ASTNode* node, SymbolTable* table) {
             analyze_ast(node->data.sequence.second, table);
             break;
             
-        case NODE_ARRAY_ACCESS:
-            analyze_ast(node->data.array_access.array, table);
-            analyze_ast(node->data.array_access.index, table);
-            
-            SymbolType array_type = get_expression_type(node->data.array_access.array, table);
-            SymbolType index_type = get_expression_type(node->data.array_access.index, table);
-            
-            if (array_type != TYPE_LISTA) {
-                fprintf(stderr, "Error at line %d: Array access on non-array type\n",
-                        node->line_number);
-            }
-            
-            if (index_type != TYPE_RA9M) {
-                fprintf(stderr, "Error at line %d: Array index must be numeric\n",
-                        node->line_number);
-            }
-            break;
-            
         case NODE_FIELD_ACCESS:
             analyze_ast(node->data.field_access.object, table);
             
             SymbolType object_type = get_expression_type(node->data.field_access.object, table);
             if (object_type != TYPE_JADWAL) {
-                fprintf(stderr, "Error at line %d: Field access on non-jadwal type\n",
-                        node->line_number);
+                semantic_error(node->line_number,
+                    "Field access on non-jadwal type %s",
+                    symbol_type_to_string(object_type));
             }
             break;
             
         case NODE_PRINT:
             analyze_ast(node->data.print_stmt.expression, table);
             break;
+            
+        case NODE_ARRAY_LITERAL: {
+            // Analyze array elements
+            ASTNode* elements = node->data.array_elements.element;
+            if (elements) {
+                // Get the type of the first element
+                SymbolType first_type = get_expression_type(elements, table);
+                
+                // Check that all elements have compatible types
+                if (!check_array_element_types(node, first_type)) {
+                    semantic_error(node->line_number,
+                        "Array elements must have compatible types");
+                }
+                
+                // Analyze each element
+                while (elements) {
+                    analyze_ast(elements, table);
+                    elements = elements->data.array_elements.next;
+                }
+            }
+            break;
+        }
             
         default:
             break;

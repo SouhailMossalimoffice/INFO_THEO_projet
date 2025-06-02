@@ -1,0 +1,9 @@
+// Test function declaration
+taarif ra9m add(ra9m a, ra9m b) {
+    raje3 a + b;
+}
+
+taarif ra9m main() {
+    kteb("Hello, World!");
+    raje3 0;
+} 

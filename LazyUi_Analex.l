@@ -30,12 +30,16 @@ static void lexer_error(const char* msg) {
 
 "taarif"        { debug_print("Found TK_TAARIF"); return TK_TAARIF; }
 "ra9m"          { debug_print("Found TK_RA9M"); return TK_RA9M; }
-"rje3"          { debug_print("Found TK_RJE3"); return TK_RJE3; }
+"raje3"         { debug_print("Found TK_RJE3"); return TK_RJE3; }
 "kteb"          { debug_print("Found TK_KTEB"); return TK_KTEB; }
 "ila"           { debug_print("Found TK_ILA"); return TK_ILA; }
 "dir"           { debug_print("Found TK_DIR"); return TK_DIR; }
 "ilamakanch"    { debug_print("Found TK_ILAMAKANCH"); return TK_ILAMAKANCH; }
 "wilakan"       { debug_print("Found TK_WILAKAN"); return TK_WILAKAN; }
+"ktaba"         { debug_print("Found TK_KTABA"); return TK_KTABA; }
+"wa9ila"        { debug_print("Found TK_WA9ILA"); return TK_WA9ILA; }
+"lista"         { debug_print("Found TK_LISTA"); return TK_LISTA; }
+"wla"           { debug_print("Found TK_WLA"); return TK_WLA; }
 
 "+"             { debug_print("Found TK_ADD"); return TK_ADD; }
 "-"             { debug_print("Found TK_SUB"); return TK_SUB; }
@@ -75,6 +79,9 @@ static void lexer_error(const char* msg) {
 "<"             { debug_print("Found TK_INF"); return TK_INF; }
 "=="            { debug_print("Found TK_EQUAL"); return TK_EQUAL; }
 "!="            { debug_print("Found TK_DIFF"); return TK_DIFF; }
+
+"true"          { debug_print("Found boolean true"); yylval.number = 1; return TK_NUMBER; }
+"false"         { debug_print("Found boolean false"); yylval.number = 0; return TK_NUMBER; }
 
 \"              { string_buf_ptr = string_buf; BEGIN(STRING); }
 <STRING>[^\"\n\\]*  { 

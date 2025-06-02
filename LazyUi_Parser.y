@@ -121,6 +121,7 @@ void extract_main_function(ASTNode* decls, ASTNode** out_decls, ASTNode** out_ma
 %token TK_TAARIF TK_RJE3 TK_MAIN TK_W TK_WLA TK_MACHI TK_L TK_B
 %token TK_ADD TK_SUB TK_MUL TK_DIV TK_HITACH TK_FI_HALAT TK_KML_HTAL
 %token TK_DIR TK_FI TK_JARRAB TK_L_KOL TK_ZID TK_MSAH TK_HTAL TK_WLALA
+%token TK_KTIB
 
 /* Operator precedence */
 %left TK_OU
@@ -134,6 +135,9 @@ void extract_main_function(ASTNode* decls, ASTNode** out_decls, ASTNode** out_ma
 /* Define types for non-terminals */
 %type <ast_node> programme declarations_fonctions declaration_fonction expression expression_arithmetique terme facteur instructions instruction instruction_retour declaration_variable affectation appel_fonction_expr arguments bloc instruction_print instruction_condition instruction_while
 %type <param_list> parametres parametre
+%type <ast_node> array_elements
+%type <string> string_literal
+%type <ast_node> instruction_ktib
 
 %%
 
@@ -208,6 +212,7 @@ instructions
 
 instruction
     : instruction_retour { debug_print("Reducing: instruction_retour"); $$ = $1; }
+    | instruction_ktib { debug_print("Reducing: instruction_ktib"); $$ = $1; }
     | declaration_variable { debug_print("Reducing: declaration_variable"); $$ = $1; }
     | affectation { debug_print("Reducing: affectation"); $$ = $1; }
     | appel_fonction_expr TK_SEMICOLON { debug_print("Reducing: function call"); $$ = $1; }
@@ -224,13 +229,31 @@ instruction_print
     }
     ;
 
-declaration_variable
-    : TK_RA9M TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON
+instruction_retour
+    : TK_RJE3 expression TK_SEMICOLON
     {
-        debug_print("Found variable declaration with initialization");
-        $$ = create_var_declaration_node($2, TYPE_RA9M, $4, yylineno);
+        debug_print("Reducing: instruction_retour (rje3)");
+        $$ = create_return_node($2, yylineno);
     }
     ;
+
+instruction_ktib
+    : TK_KTIB string_literal TK_SEMICOLON { $$ = create_print_node(create_string_node($2, yylineno), yylineno); }
+    ;
+
+string_literal
+    : TK_STRING { $$ = $1; }
+    ;
+
+declaration_variable
+    : TK_RA9M TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON
+      { debug_print("Found ra9m variable declaration"); $$ = create_var_declaration_node($2, TYPE_RA9M, $4, yylineno); }
+    | TK_KTABA TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON
+      { debug_print("Found ktaba variable declaration"); $$ = create_var_declaration_node($2, TYPE_KTABA, $4, yylineno); }
+    | TK_WA9ILA TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON
+      { debug_print("Found wa9ila variable declaration"); $$ = create_var_declaration_node($2, TYPE_WA9ILA, $4, yylineno); }
+    | TK_LISTA TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON
+      { debug_print("Found lista variable declaration"); $$ = create_var_declaration_node($2, TYPE_LISTA, $4, yylineno); }
 
 affectation
     : TK_IDENTIFIANT TK_AFFECTATION expression TK_SEMICOLON
@@ -240,17 +263,14 @@ affectation
     }
     ;
 
-instruction_retour
-    : TK_RJE3 expression TK_SEMICOLON
-    {
-        debug_print("Reducing: instruction_retour (rje3)");
-        $$ = create_return_node($2, yylineno);
-    }
-    ;
-
 expression
     : expression_arithmetique { $$ = $1; }
     | TK_STRING { $$ = create_string_node($1, yylineno); }
+    | TK_LBRACKET array_elements TK_RBRACKET
+    {
+        debug_print("Found array literal");
+        $$ = create_array_literal_node($2, yylineno);
+    }
     | expression TK_ADD expression
     {
         debug_print("Found string concatenation or addition");
@@ -276,6 +296,12 @@ expression
         debug_print("Found inequality comparison");
         $$ = create_binary_op_node(OP_NEQ, $1, $3, yylineno);
     }
+    ;
+
+array_elements
+    : /* empty */ { $$ = NULL; }
+    | expression { $$ = create_array_elements_node($1, NULL); }
+    | array_elements TK_COMMA expression { $$ = create_array_elements_node($3, $1); }
     ;
 
 expression_arithmetique
@@ -316,6 +342,11 @@ facteur
     {
         debug_print("Found identifier");
         $$ = create_identifier_node($1, yylineno);
+    }
+    | TK_IDENTIFIANT TK_LBRACKET expression TK_RBRACKET
+    {
+        debug_print("Found array access");
+        $$ = create_array_access_node(create_identifier_node($1, yylineno), $3, yylineno);
     }
     | TK_LPAREN expression TK_RPAREN { $$ = $2; }
     | appel_fonction_expr { $$ = $1; }
@@ -362,7 +393,12 @@ instruction_condition
     }
     | TK_ILA TK_LPAREN expression TK_RPAREN TK_DIR bloc TK_ILAMAKANCH bloc
     {
-        debug_print("Found if-else statement");
+        debug_print("Found if-else statement with ilamakanch");
+        $$ = create_if_node($3, $6, $8, yylineno);
+    }
+    | TK_ILA TK_LPAREN expression TK_RPAREN TK_DIR bloc TK_WLA bloc
+    {
+        debug_print("Found if-else statement with wla");
         $$ = create_if_node($3, $6, $8, yylineno);
     }
     ;

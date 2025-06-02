@@ -117,7 +117,9 @@ typedef enum {
     NODE_PROGRAM,
     NODE_ARRAY_ACCESS,
     NODE_FIELD_ACCESS,
-    NODE_PRINT
+    NODE_PRINT,
+    NODE_ARRAY_LITERAL,
+    NODE_ARRAY_ELEMENTS
 } NodeType;
 
 /* Operator types */
@@ -213,6 +215,7 @@ typedef struct ASTNode {
         struct {
             ASTNode* array;
             ASTNode* index;
+            SymbolType element_type;  /* Type of array elements */
         } array_access;
         struct {
             ASTNode* object;
@@ -221,6 +224,10 @@ typedef struct ASTNode {
         struct {
             ASTNode* expression;
         } print_stmt;
+        struct {
+            struct ASTNode* element;
+            struct ASTNode* next;
+        } array_elements;
     } data;
 } ASTNode;
 
@@ -255,6 +262,8 @@ ASTNode* create_function_call_node(char *func_name, ASTNode **arguments, int arg
 ASTNode* create_return_node(ASTNode *expr, int line);
 ASTNode* create_sequence_node(ASTNode *first, ASTNode *second, int line);
 ASTNode* create_print_node(ASTNode *expression, int line);
+ASTNode* create_array_elements_node(ASTNode* element, ASTNode* next);
+ASTNode* create_array_literal_node(ASTNode* elements, int line);
 
 /* Function to free an AST node and all its children */
 void free_ast_node(ASTNode *node);
